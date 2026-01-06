@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Юпитер - Красота космоса</title>
+    <title>3D Юпитер - Космическая красота</title>
     <style>
         * {
             margin: 0;
@@ -12,13 +12,13 @@
         }
 
         body {
-            background: #000;
+            background: #000000;
             overflow: hidden;
             font-family: 'Arial', sans-serif;
             height: 100vh;
             width: 100vw;
             cursor: grab;
-            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body:active {
@@ -40,7 +40,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
+            background: #000000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -58,10 +58,10 @@
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 154, 60, 0.3);
-            border-top: 3px solid #ff9a3c;
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 154, 60, 0.2);
+            border-top: 4px solid #ff9a3c;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -71,224 +71,288 @@
             100% { transform: rotate(360deg); }
         }
 
-        .controls {
+        /* Скрытые элементы */
+        .hidden-element {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-            text-align: center;
-            z-index: 10;
+            opacity: 0;
             pointer-events: none;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
+            z-index: -1;
         }
 
-        .counter {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: rgba(255, 154, 60, 0.5);
-            font-size: 14px;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 8px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 154, 60, 0.2);
-            transition: all 0.3s;
-        }
-
-        .counter:hover {
-            color: rgba(255, 154, 60, 0.8);
-            border-color: rgba(255, 154, 60, 0.5);
-        }
-
+        /* Эффект взрыва */
         .explosion-text {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 100px;
-            font-weight: bold;
-            color: #ff3366;
+            font-size: 120px;
+            font-weight: 900;
+            color: #ff0066;
             text-shadow: 
-                0 0 20px #ff0066,
-                0 0 40px #ff3366,
-                0 0 80px #ff6699;
-            z-index: 1000;
+                0 0 30px #ff0066,
+                0 0 60px #ff3366,
+                0 0 90px #ff6699,
+                0 0 120px #ff99cc;
+            z-index: 2000;
             opacity: 0;
             pointer-events: none;
             font-family: 'Impact', 'Arial Black', sans-serif;
             text-align: center;
             line-height: 1.2;
-            transition: all 0.5s;
+            letter-spacing: 2px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: blur(0);
         }
 
         .explosion-text.visible {
             opacity: 1;
-            animation: textPulse 2s ease-out forwards;
+            animation: textBoom 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
-        @keyframes textPulse {
+        @keyframes textBoom {
             0% {
-                transform: translate(-50%, -50%) scale(0);
+                transform: translate(-50%, -50%) scale(0.1) rotate(-180deg);
                 opacity: 0;
-                filter: blur(20px);
+                filter: blur(50px) brightness(10);
             }
-            20% {
-                transform: translate(-50%, -50%) scale(1.3);
+            15% {
+                transform: translate(-50%, -50%) scale(1.4) rotate(15deg);
                 opacity: 1;
-                filter: blur(0);
+                filter: blur(0) brightness(3);
             }
-            40% {
-                transform: translate(-50%, -50%) scale(1);
+            30% {
+                transform: translate(-50%, -50%) scale(1) rotate(-8deg);
+                filter: blur(0) brightness(2);
+            }
+            45% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+                filter: blur(0) brightness(1.5);
             }
             60% {
-                transform: translate(-50%, -50%) scale(1.1);
+                transform: translate(-50%, -50%) scale(1) rotate(0);
+                filter: blur(0) brightness(1.2);
             }
-            80% {
+            75% {
+                transform: translate(-50%, -50%) scale(1.05);
+                filter: blur(0) brightness(1.1);
+            }
+            90% {
                 transform: translate(-50%, -50%) scale(1);
                 opacity: 1;
+                filter: blur(0) brightness(1);
             }
             100% {
-                transform: translate(-50%, -50%) scale(1);
+                transform: translate(-50%, -50%) scale(0.9);
                 opacity: 0;
-                filter: blur(10px);
+                filter: blur(20px) brightness(0.5);
             }
         }
 
-        .heart {
+        .heart-particle {
             position: absolute;
-            font-size: 30px;
+            font-size: 40px;
             opacity: 0;
-            z-index: 100;
+            z-index: 1000;
             pointer-events: none;
-            animation: heartFloat 2s ease-out forwards;
+            filter: drop-shadow(0 0 15px rgba(255, 51, 102, 0.8));
+            animation: heartFly 2s ease-out forwards;
         }
 
-        @keyframes heartFloat {
+        @keyframes heartFly {
             0% {
-                transform: translate(0, 0) scale(0);
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                transform: translate(var(--tx), -30px) scale(1) rotate(0deg);
                 opacity: 1;
             }
             50% {
-                transform: translate(var(--tx), -100px) scale(1);
-                opacity: 1;
+                transform: translate(calc(var(--tx) * 1.5), -120px) scale(1.2) rotate(180deg);
+                opacity: 0.8;
+            }
+            80% {
+                transform: translate(calc(var(--tx) * 2), -180px) scale(0.8) rotate(360deg);
+                opacity: 0.3;
             }
             100% {
-                transform: translate(var(--tx), -200px) scale(0);
+                transform: translate(calc(var(--tx) * 2.5), -250px) scale(0) rotate(450deg);
                 opacity: 0;
             }
         }
 
-        .click-effect {
+        .click-ripple {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 1px;
+            height: 1px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 154, 60, 0.4) 0%, rgba(255, 154, 60, 0) 70%);
+            background: radial-gradient(circle, rgba(255, 154, 60, 0.6) 0%, rgba(255, 154, 60, 0) 70%);
             pointer-events: none;
-            z-index: 50;
+            z-index: 100;
             transform: translate(-50%, -50%);
-            animation: ripple 0.6s ease-out forwards;
+            animation: rippleExpand 0.8s ease-out forwards;
         }
 
-        @keyframes ripple {
+        @keyframes rippleExpand {
             0% {
                 width: 0;
                 height: 0;
                 opacity: 0.8;
+                box-shadow: 0 0 0 0 rgba(255, 154, 60, 0.4);
             }
             100% {
-                width: 200px;
-                height: 200px;
+                width: 150px;
+                height: 150px;
                 opacity: 0;
+                box-shadow: 0 0 0 100px rgba(255, 154, 60, 0);
             }
         }
 
-        .progress {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 100px;
+        /* Индикатор прогресса (только при наведении) */
+        .secret-progress {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 2px;
             overflow: hidden;
-            opacity: 0.5;
-            transition: opacity 0.3s;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 100;
         }
 
-        .progress:hover {
-            opacity: 0.8;
+        .secret-progress:hover {
+            opacity: 0.3;
         }
 
-        .progress-bar {
+        .secret-progress-bar {
             height: 100%;
             width: 0%;
             background: linear-gradient(90deg, #ff9a3c, #ff3366);
             border-radius: 2px;
-            transition: width 0.5s ease-out;
+            transition: width 0.3s ease-out;
+        }
+
+        /* Подсказка управления */
+        .controls-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 154, 60, 0.1);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            transition: all 1s ease;
+        }
+
+        .controls-hint.fade {
+            opacity: 0.1;
+            transform: translateX(-50%) translateY(10px);
+        }
+
+        /* Вспышка при взрыве */
+        .explosion-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, 
+                rgba(255, 100, 0, 0.8) 0%,
+                rgba(255, 50, 0, 0.4) 30%,
+                rgba(255, 0, 0, 0) 70%);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
         }
 
         @media (max-width: 768px) {
-            .controls {
-                font-size: 12px;
-                bottom: 10px;
+            .explosion-text {
+                font-size: 80px;
             }
             
+            .controls-hint {
+                font-size: 12px;
+                bottom: 20px;
+                padding: 10px 15px;
+            }
+            
+            .secret-progress {
+                bottom: 10px;
+                right: 10px;
+                width: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
             .explosion-text {
                 font-size: 60px;
             }
             
-            .counter {
-                top: 10px;
-                right: 10px;
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-            
-            .progress {
-                top: 10px;
-                left: 10px;
-                width: 80px;
+            .controls-hint {
+                font-size: 11px;
+                bottom: 15px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Загрузка -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
-        <div>Загрузка Юпитера...</div>
+        <div>🌌 Инициализация космической сцены...</div>
     </div>
 
-    <div class="progress" id="progress">
-        <div class="progress-bar" id="progressBar"></div>
+    <!-- Скрытые элементы -->
+    <div class="hidden-element" id="tapCounter">0</div>
+    <div class="secret-progress" id="secretProgress">
+        <div class="secret-progress-bar" id="progressBar"></div>
     </div>
 
-    <div class="counter" id="counter" title="Секретный счетчик">0/100</div>
-
+    <!-- Эффекты взрыва -->
+    <div class="explosion-flash" id="explosionFlash"></div>
     <div class="explosion-text" id="explosionText">sosat bibijon❤️</div>
 
-    <div class="controls">
-        ЛКМ: вращение • Колесо: масштаб • Тапы по Юпитеру
+    <!-- Подсказка -->
+    <div class="controls-hint" id="controlsHint">
+        ЛКМ: ВРАЩЕНИЕ • КОЛЕСО: МАСШТАБ • ДВА ПАЛЬЦА: ПРИБЛИЖЕНИЕ
     </div>
 
+    <!-- Контейнер для Three.js -->
     <div id="container"></div>
 
+    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <script>
         // ============ КОНФИГУРАЦИЯ ============
         const CONFIG = {
-            tapTarget: 100,
-            quality: 'medium',
-            rotationSpeed: 0.1,
-            particleCount: 2000,
-            starCount: 3000
+            requiredTaps: 100,           // Ровно 100 кликов для взрыва
+            autoRotateSpeed: 0.3,        // Скорость автоматического вращения
+            manualRotateSpeed: 0.8,      // Скорость вращения при drag
+            zoomSpeed: 0.001,            // Скорость зума
+            starCount: 5000,             // Количество звезд
+            asteroidCount: 2000,         // Количество астероидов
+            explosionParticleCount: 800, // Частиц при взрыве
+            heartCount: 60,              // Количество сердечек
+            jupiterRadius: 5,            // Радиус Юпитера
+            ringInnerRadius: 7,          // Внутренний радиус колец
+            ringOuterRadius: 11,         // Внешний радиус колец
+            cameraDistance: 18,          // Расстояние камеры
+            cameraMinDistance: 6,        // Минимальное приближение
+            cameraMaxDistance: 40        // Максимальное отдаление
         };
 
         // ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
@@ -297,84 +361,143 @@
         let tapCount = 0;
         let isExploded = false;
         let explosionParticles = [];
+        let lastTapTime = 0;
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let autoRotate = true;
+        let autoRotateTimeout;
 
         // ============ ИНИЦИАЛИЗАЦИЯ ============
         function init() {
-            // Сцена
+            console.log('🚀 Инициализация сцены...');
+            
+            // 1. Создаем сцену
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000010);
             
-            // Камера
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 0, 15);
+            // 2. Настраиваем камеру
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, CONFIG.cameraDistance);
             
-            // Рендерер
+            // 3. Создаем рендерер с балансом качества/производительности
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true,
                 alpha: true,
                 powerPreference: "high-performance"
             });
+            
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
             document.getElementById('container').appendChild(renderer.domElement);
             
-            // Создание объектов
-            createStars();
+            // 4. Создаем все объекты с хорошей детализацией
+            createStarField();
             createJupiter();
             createAtmosphere();
             createRings();
-            createAsteroids();
+            createAsteroidBelt();
             createLighting();
             
-            // Настройка событий
+            // 5. Настраиваем обработчики событий
             setupEventListeners();
             
-            // Скрытие загрузки
+            // 6. Скрываем загрузку
             setTimeout(() => {
                 document.getElementById('loading').classList.add('hidden');
-            }, 1500);
+                // Скрываем подсказку через 8 секунд
+                setTimeout(() => {
+                    document.getElementById('controlsHint').classList.add('fade');
+                }, 8000);
+            }, 2000);
             
-            // Запуск анимации
+            // 7. Запускаем анимацию
             animate();
         }
         
         // ============ СОЗДАНИЕ ОБЪЕКТОВ ============
-        function createStars() {
+        function createStarField() {
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(CONFIG.starCount * 3);
             const colors = new Float32Array(CONFIG.starCount * 3);
+            const sizes = new Float32Array(CONFIG.starCount);
             
             for(let i = 0; i < CONFIG.starCount; i++) {
                 const i3 = i * 3;
-                positions[i3] = (Math.random() - 0.5) * 2000;
-                positions[i3 + 1] = (Math.random() - 0.5) * 2000;
-                positions[i3 + 2] = (Math.random() - 0.5) * 2000;
                 
-                // Разные цвета звезд
-                const type = Math.random();
-                if(type < 0.7) {
+                // Сферическое распределение
+                const radius = 500 + Math.random() * 1000;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+                
+                positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i3 + 1] = radius * Math.cos(phi);
+                positions[i3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+                
+                // Реалистичные цвета звезд
+                const temperature = Math.random();
+                if(temperature < 0.6) {
                     colors[i3] = 0.8;
-                    colors[i3 + 1] = 0.8;
+                    colors[i3 + 1] = 0.85;
                     colors[i3 + 2] = 1.0;
-                } else if(type < 0.9) {
+                } else if(temperature < 0.85) {
                     colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.9;
-                    colors[i3 + 2] = 0.8;
+                    colors[i3 + 1] = 0.95;
+                    colors[i3 + 2] = 0.9;
+                } else if(temperature < 0.95) {
+                    colors[i3] = 1.0;
+                    colors[i3 + 1] = 0.85;
+                    colors[i3 + 2] = 0.7;
                 } else {
                     colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.8;
-                    colors[i3 + 2] = 0.6;
+                    colors[i3 + 1] = 0.7;
+                    colors[i3 + 2] = 0.5;
                 }
+                
+                sizes[i] = Math.random() * 2 + 0.5;
             }
             
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
             
-            const material = new THREE.PointsMaterial({
-                size: 1.5,
-                vertexColors: true,
-                transparent: true
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    time: { value: 0.0 }
+                },
+                vertexShader: `
+                    attribute float size;
+                    attribute vec3 color;
+                    varying vec3 vColor;
+                    uniform float time;
+                    
+                    void main() {
+                        vColor = color;
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        
+                        // Легкое мерцание
+                        float flicker = sin(time * 2.0 + float(gl_VertexID) * 0.01) * 0.1 + 0.9;
+                        
+                        gl_PointSize = size * (300.0 / -mvPosition.z) * flicker;
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vColor;
+                    
+                    void main() {
+                        float r = distance(gl_PointCoord, vec2(0.5, 0.5));
+                        if(r > 0.5) discard;
+                        
+                        float alpha = 1.0 - smoothstep(0.0, 0.5, r);
+                        gl_FragColor = vec4(vColor, alpha);
+                    }
+                `,
+                transparent: true,
+                blending: THREE.AdditiveBlending
             });
             
             stars = new THREE.Points(geometry, material);
@@ -382,15 +505,20 @@
         }
         
         function createJupiter() {
-            const geometry = new THREE.SphereGeometry(4, 64, 64);
+            console.log('🪐 Создание Юпитера...');
             
-            // Создаем текстуру Юпитера
+            // Геометрия с хорошей детализацией
+            const geometry = new THREE.SphereGeometry(CONFIG.jupiterRadius, 96, 96);
+            
+            // Создаем качественную текстуру
             const texture = createJupiterTexture();
             
             const material = new THREE.MeshStandardMaterial({
                 map: texture,
-                roughness: 0.8,
-                metalness: 0.2
+                roughness: 0.7,
+                metalness: 0.2,
+                emissive: new THREE.Color(0x221100),
+                emissiveIntensity: 0.05
             });
             
             jupiter = new THREE.Mesh(geometry, material);
@@ -401,61 +529,115 @@
         
         function createJupiterTexture() {
             const canvas = document.createElement('canvas');
-            canvas.width = 1024;
-            canvas.height = 512;
+            canvas.width = 1536; // Хороший баланс качества
+            canvas.height = 768;
             const ctx = canvas.getContext('2d');
             
-            // Базовый градиент
+            // Создаем основной градиент
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            gradient.addColorStop(0, '#FFD8A8');
-            gradient.addColorStop(0.2, '#FFB347');
-            gradient.addColorStop(0.4, '#E68A2E');
-            gradient.addColorStop(0.6, '#CC6E1D');
-            gradient.addColorStop(0.8, '#B35917');
-            gradient.addColorStop(1, '#994C13');
+            gradient.addColorStop(0.0, '#FFE5B4');
+            gradient.addColorStop(0.15, '#FFD8A8');
+            gradient.addColorStop(0.35, '#FFB347');
+            gradient.addColorStop(0.55, '#FF8C42');
+            gradient.addColorStop(0.75, '#E68A2E');
+            gradient.addColorStop(0.9, '#CC6E1D');
+            gradient.addColorStop(1.0, '#B35917');
             
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Детализированные полосы
-            ctx.strokeStyle = 'rgba(139, 69, 19, 0.9)';
-            ctx.lineWidth = 15;
+            // Рисуем атмосферные полосы
+            ctx.strokeStyle = 'rgba(139, 69, 19, 0.85)';
+            ctx.lineWidth = 18;
             
-            for(let i = 0; i < 7; i++) {
-                const y = i * 70 + 20;
+            for(let i = 0; i < 8; i++) {
+                const y = i * 90 + 40;
                 ctx.beginPath();
                 ctx.moveTo(0, y);
                 ctx.bezierCurveTo(
-                    canvas.width * 0.3, y + Math.random() * 30 - 15,
-                    canvas.width * 0.7, y + Math.random() * 30 - 15,
+                    canvas.width * 0.3, y + Math.random() * 25 - 12.5,
+                    canvas.width * 0.7, y + Math.random() * 25 - 12.5,
                     canvas.width, y
                 );
                 ctx.stroke();
             }
             
-            // Большое Красное Пятно
+            // Большое Красное Пятно с деталями
+            const spotX = canvas.width * 0.72;
+            const spotY = canvas.height * 0.38;
+            const spotWidth = 100;
+            const spotHeight = 45;
+            
+            // Основное пятно
             ctx.fillStyle = '#8B0000';
             ctx.beginPath();
-            ctx.ellipse(canvas.width * 0.7, canvas.height * 0.4, 50, 25, Math.PI/6, 0, Math.PI * 2);
+            ctx.ellipse(spotX, spotY, spotWidth, spotHeight, Math.PI/5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Внутренняя часть
+            ctx.fillStyle = '#A52A2A';
+            ctx.beginPath();
+            ctx.ellipse(spotX, spotY, spotWidth * 0.7, spotHeight * 0.7, Math.PI/5, 0, Math.PI * 2);
             ctx.fill();
             
             // Детали пятна
-            ctx.fillStyle = '#A52A2A';
-            ctx.beginPath();
-            ctx.ellipse(canvas.width * 0.7, canvas.height * 0.4, 35, 18, Math.PI/6, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.strokeStyle = '#FF4500';
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 0.6;
+            
+            for(let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const radius = spotWidth * 0.6;
+                
+                ctx.beginPath();
+                ctx.arc(
+                    spotX + Math.cos(angle) * radius * 0.5,
+                    spotY + Math.sin(angle) * radius * 0.5,
+                    radius * 0.2,
+                    angle - Math.PI/3,
+                    angle + Math.PI/3
+                );
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
             
             // Атмосферные вихри
-            ctx.globalAlpha = 0.6;
-            for(let i = 0; i < 30; i++) {
+            ctx.globalAlpha = 0.7;
+            for(let i = 0; i < 25; i++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
-                const size = Math.random() * 20 + 10;
+                const size = Math.random() * 35 + 15;
                 
-                ctx.fillStyle = i % 3 === 0 ? '#FF6347' : i % 3 === 1 ? '#FF4500' : '#FF8C00';
+                // Пропускаем если попадает на пятно
+                const distToSpot = Math.sqrt(Math.pow(x - spotX, 2) + Math.pow(y - spotY, 2));
+                if(distToSpot < 150) continue;
+                
+                const colors = ['#FF6347', '#FF4500', '#FF8C00', '#DC143C'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                ctx.fillStyle = color;
                 ctx.beginPath();
                 ctx.arc(x, y, size, 0, Math.PI * 2);
                 ctx.fill();
+                
+                // Спиральные линии
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for(let j = 0; j < size * 2; j += 2) {
+                    const angle = j * 0.2;
+                    const radius = j * 0.5;
+                    
+                    const spiralX = x + Math.cos(angle) * radius;
+                    const spiralY = y + Math.sin(angle) * radius;
+                    
+                    if(j === 0) {
+                        ctx.moveTo(spiralX, spiralY);
+                    } else {
+                        ctx.lineTo(spiralX, spiralY);
+                    }
+                }
+                ctx.stroke();
             }
             ctx.globalAlpha = 1;
             
@@ -467,12 +649,14 @@
         }
         
         function createAtmosphere() {
-            const geometry = new THREE.SphereGeometry(4.1, 48, 48);
+            const geometry = new THREE.SphereGeometry(CONFIG.jupiterRadius * 1.05, 64, 64);
+            
             const material = new THREE.MeshBasicMaterial({
                 color: 0x4488ff,
                 transparent: true,
                 opacity: 0.08,
-                side: THREE.BackSide
+                side: THREE.BackSide,
+                blending: THREE.AdditiveBlending
             });
             
             atmosphere = new THREE.Mesh(geometry, material);
@@ -480,62 +664,84 @@
         }
         
         function createRings() {
-            const geometry = new THREE.RingGeometry(6, 9, 48);
-            const material = new THREE.MeshBasicMaterial({
-                color: 0xFF9A3C,
+            // Основное кольцо
+            const ringGeometry = new THREE.RingGeometry(
+                CONFIG.ringInnerRadius, 
+                CONFIG.ringOuterRadius, 
+                128
+            );
+            
+            const ringMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFFD8A8,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.06
+                opacity: 0.07,
+                blending: THREE.AdditiveBlending
             });
             
-            rings = new THREE.Mesh(geometry, material);
+            rings = new THREE.Mesh(ringGeometry, ringMaterial);
             rings.rotation.x = Math.PI / 4;
             scene.add(rings);
             
-            // Внутренние кольца
-            const innerGeometry = new THREE.RingGeometry(5, 6, 32);
-            const innerMaterial = new THREE.MeshBasicMaterial({
+            // Внутреннее тонкое кольцо
+            const innerRingGeometry = new THREE.RingGeometry(
+                CONFIG.ringInnerRadius - 1, 
+                CONFIG.ringInnerRadius, 
+                64
+            );
+            
+            const innerRingMaterial = new THREE.MeshBasicMaterial({
                 color: 0xFFB347,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.03
+                opacity: 0.04
             });
             
-            const innerRings = new THREE.Mesh(innerGeometry, innerMaterial);
-            innerRings.rotation.x = Math.PI / 4.2;
+            const innerRings = new THREE.Mesh(innerRingGeometry, innerRingMaterial);
+            innerRings.rotation.x = Math.PI / 4.1;
             scene.add(innerRings);
         }
         
-        function createAsteroids() {
+        function createAsteroidBelt() {
             const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(CONFIG.particleCount * 3);
-            const colors = new Float32Array(CONFIG.particleCount * 3);
-            const sizes = new Float32Array(CONFIG.particleCount);
+            const positions = new Float32Array(CONFIG.asteroidCount * 3);
+            const colors = new Float32Array(CONFIG.asteroidCount * 3);
+            const sizes = new Float32Array(CONFIG.asteroidCount);
             
-            for(let i = 0; i < CONFIG.particleCount; i++) {
+            for(let i = 0; i < CONFIG.asteroidCount; i++) {
                 const i3 = i * 3;
                 
-                const radius = 15 + Math.random() * 30;
+                // Тороидальное распределение (пояс астероидов)
+                const radius = 18 + Math.random() * 25;
                 const angle = Math.random() * Math.PI * 2;
-                const spread = (Math.random() - 0.5) * 10;
+                const spread = (Math.random() - 0.5) * 8;
                 
                 positions[i3] = Math.cos(angle) * radius + spread;
-                positions[i3 + 1] = (Math.random() - 0.5) * 20;
+                positions[i3 + 1] = (Math.random() - 0.5) * 15;
                 positions[i3 + 2] = Math.sin(angle) * radius + spread;
                 
-                const type = Math.random();
-                if(type < 0.3) {
+                // Разные типы астероидов
+                const asteroidType = Math.random();
+                if(asteroidType < 0.4) {
+                    // Ледяные
                     colors[i3] = 0.9;
                     colors[i3 + 1] = 0.95;
                     colors[i3 + 2] = 1.0;
-                } else if(type < 0.6) {
+                } else if(asteroidType < 0.7) {
+                    // Каменные
                     colors[i3] = 0.8;
                     colors[i3 + 1] = 0.7;
                     colors[i3 + 2] = 0.6;
-                } else {
+                } else if(asteroidType < 0.9) {
+                    // Металлические
                     colors[i3] = 0.9;
                     colors[i3 + 1] = 0.9;
                     colors[i3 + 2] = 0.8;
+                } else {
+                    // Углеродистые
+                    colors[i3] = 0.4;
+                    colors[i3 + 1] = 0.4;
+                    colors[i3 + 2] = 0.4;
                 }
                 
                 sizes[i] = Math.random() * 0.2 + 0.05;
@@ -557,23 +763,32 @@
         }
         
         function createLighting() {
-            const sunLight = new THREE.DirectionalLight(0xFFFFFF, 1.2);
-            sunLight.position.set(15, 10, 10);
+            // Основной солнечный свет
+            const sunLight = new THREE.DirectionalLight(0xFFFFFF, 1.5);
+            sunLight.position.set(20, 15, 15);
             sunLight.castShadow = true;
             scene.add(sunLight);
             
-            const fillLight = new THREE.DirectionalLight(0xFFB347, 0.3);
+            // Заполняющий свет
+            const fillLight = new THREE.DirectionalLight(0xFFB347, 0.4);
             fillLight.position.set(-10, -5, -5);
             scene.add(fillLight);
             
+            // Контровой свет
+            const backLight = new THREE.DirectionalLight(0xFFD8A8, 0.2);
+            backLight.position.set(-5, 5, -15);
+            scene.add(backLight);
+            
+            // Рассеянный свет
             const ambientLight = new THREE.AmbientLight(0x333344, 0.1);
             scene.add(ambientLight);
             
             // Видимое Солнце
-            const sunGeometry = new THREE.SphereGeometry(2, 16, 16);
+            const sunGeometry = new THREE.SphereGeometry(2.5, 24, 24);
             const sunMaterial = new THREE.MeshBasicMaterial({
                 color: 0xFFFF00,
-                emissive: 0xFFFF00
+                emissive: 0xFFFF00,
+                emissiveIntensity: 1.5
             });
             
             const sun = new THREE.Mesh(sunGeometry, sunMaterial);
@@ -581,116 +796,151 @@
             scene.add(sun);
         }
         
-        // ============ УПРАВЛЕНИЕ И ВЗРЫВ ============
+        // ============ УПРАВЛЕНИЕ И СЧЕТЧИК ============
         function setupEventListeners() {
-            let isDragging = false;
-            let previousMousePosition = { x: 0, y: 0 };
+            // Мышь для вращения
+            renderer.domElement.addEventListener('mousedown', onMouseDown);
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
+            renderer.domElement.addEventListener('mouseup', onMouseUp);
+            renderer.domElement.addEventListener('mouseleave', onMouseUp);
             
-            // Мышь
-            renderer.domElement.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                previousMousePosition = { x: e.clientX, y: e.clientY };
+            // Колесико для зума
+            renderer.domElement.addEventListener('wheel', onMouseWheel);
+            
+            // Касания для мобильных
+            renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false });
+            renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: false });
+            renderer.domElement.addEventListener('touchend', onTouchEnd);
+            
+            // Клики для счетчика (только по Юпитеру)
+            renderer.domElement.addEventListener('click', handleClick);
+            
+            // Предотвращаем контекстное меню
+            renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+            
+            // Ресайз окна
+            window.addEventListener('resize', onWindowResize);
+            
+            // Показываем прогресс при наведении
+            document.getElementById('secretProgress').addEventListener('mouseenter', () => {
+                document.getElementById('secretProgress').style.opacity = '0.3';
             });
             
-            renderer.domElement.addEventListener('mousemove', (e) => {
-                if (!isDragging || isExploded) return;
-                
-                const deltaX = e.clientX - previousMousePosition.x;
-                const deltaY = e.clientY - previousMousePosition.y;
-                
-                if (jupiter) {
-                    jupiter.rotation.y += deltaX * 0.01;
-                    jupiter.rotation.x += deltaY * 0.01;
-                }
-                
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            });
-            
-            renderer.domElement.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
-            
-            // Колесико
-            renderer.domElement.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                camera.position.z += e.deltaY * 0.01;
-                camera.position.z = Math.max(5, Math.min(camera.position.z, 50));
-            });
-            
-            // Касания
-            let touchStart = { x: 0, y: 0 };
-            let touchDistance = 0;
-            
-            renderer.domElement.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                touchStart = {
-                    x: e.touches[0].clientX,
-                    y: e.touches[0].clientY
-                };
-                
-                if (e.touches.length === 1) {
-                    // Одиночный тап - проверяем на взрыв
-                    const touch = e.touches[0];
-                    checkForTap(touch.clientX, touch.clientY);
-                } else if (e.touches.length === 2) {
-                    touchDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                }
-            });
-            
-            renderer.domElement.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                
-                if (e.touches.length === 1 && !isExploded) {
-                    const deltaX = e.touches[0].clientX - touchStart.x;
-                    const deltaY = e.touches[0].clientY - touchStart.y;
-                    
-                    if (jupiter) {
-                        jupiter.rotation.y += deltaX * 0.01;
-                        jupiter.rotation.x += deltaY * 0.01;
-                    }
-                    
-                    touchStart = {
-                        x: e.touches[0].clientX,
-                        y: e.touches[0].clientY
-                    };
-                } else if (e.touches.length === 2) {
-                    const newDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    
-                    const zoomChange = (newDistance - touchDistance) * 0.01;
-                    camera.position.z -= zoomChange;
-                    camera.position.z = Math.max(5, Math.min(camera.position.z, 50));
-                    
-                    touchDistance = newDistance;
-                }
-            });
-            
-            // Клики для взрыва
-            renderer.domElement.addEventListener('click', (e) => {
-                checkForTap(e.clientX, e.clientY);
-            });
-            
-            // Ресайз
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('secretProgress').addEventListener('mouseleave', () => {
+                document.getElementById('secretProgress').style.opacity = '0';
             });
         }
         
-        function checkForTap(x, y) {
+        function onMouseDown(event) {
+            isDragging = true;
+            previousMousePosition = { x: event.clientX, y: event.clientY };
+            autoRotate = false;
+            clearTimeout(autoRotateTimeout);
+        }
+        
+        function onMouseMove(event) {
+            if (!isDragging || isExploded) return;
+            
+            const deltaX = event.clientX - previousMousePosition.x;
+            const deltaY = event.clientY - previousMousePosition.y;
+            
+            if (jupiter) {
+                jupiter.rotation.y += deltaX * CONFIG.manualRotateSpeed * 0.01;
+                jupiter.rotation.x += deltaY * CONFIG.manualRotateSpeed * 0.01;
+                
+                // Ограничиваем вращение по X
+                jupiter.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, jupiter.rotation.x));
+            }
+            
+            if (atmosphere) atmosphere.rotation.y = jupiter.rotation.y;
+            
+            previousMousePosition = { x: event.clientX, y: event.clientY };
+        }
+        
+        function onMouseUp() {
+            isDragging = false;
+            // Возвращаем авто-вращение через 3 секунды бездействия
+            autoRotateTimeout = setTimeout(() => {
+                autoRotate = true;
+            }, 3000);
+        }
+        
+        function onMouseWheel(event) {
+            event.preventDefault();
+            camera.position.z += event.deltaY * CONFIG.zoomSpeed;
+            camera.position.z = Math.max(CONFIG.cameraMinDistance, Math.min(CONFIG.cameraMaxDistance, camera.position.z));
+        }
+        
+        function onTouchStart(event) {
+            event.preventDefault();
+            if (event.touches.length === 1) {
+                isDragging = true;
+                previousMousePosition = { 
+                    x: event.touches[0].clientX, 
+                    y: event.touches[0].clientY 
+                };
+                autoRotate = false;
+                clearTimeout(autoRotateTimeout);
+            }
+        }
+        
+        function onTouchMove(event) {
+            event.preventDefault();
+            
+            if (event.touches.length === 1 && isDragging && !isExploded) {
+                const deltaX = event.touches[0].clientX - previousMousePosition.x;
+                const deltaY = event.touches[0].clientY - previousMousePosition.y;
+                
+                if (jupiter) {
+                    jupiter.rotation.y += deltaX * CONFIG.manualRotateSpeed * 0.01;
+                    jupiter.rotation.x += deltaY * CONFIG.manualRotateSpeed * 0.01;
+                    
+                    // Ограничиваем вращение по X
+                    jupiter.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, jupiter.rotation.x));
+                }
+                
+                if (atmosphere) atmosphere.rotation.y = jupiter.rotation.y;
+                
+                previousMousePosition = { 
+                    x: event.touches[0].clientX, 
+                    y: event.touches[0].clientY 
+                };
+            } else if (event.touches.length === 2) {
+                // Масштабирование двумя пальцами
+                const touch1 = event.touches[0];
+                const touch2 = event.touches[1];
+                
+                const currentDistance = Math.hypot(
+                    touch1.clientX - touch2.clientX,
+                    touch1.clientY - touch2.clientY
+                );
+                
+                camera.position.z += (currentDistance * 0.01);
+                camera.position.z = Math.max(CONFIG.cameraMinDistance, Math.min(CONFIG.cameraMaxDistance, camera.position.z));
+            }
+        }
+        
+        function onTouchEnd(event) {
+            if (event.touches.length === 0) {
+                isDragging = false;
+                // Возвращаем авто-вращение через 3 секунды
+                autoRotateTimeout = setTimeout(() => {
+                    autoRotate = true;
+                }, 3000);
+            }
+        }
+        
+        function handleClick(event) {
             if (isExploded) return;
             
             const rect = renderer.domElement.getBoundingClientRect();
-            const mouse = {
-                x: ((x - rect.left) / rect.width) * 2 - 1,
-                y: -((y - rect.top) / rect.height) * 2 + 1
-            };
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Проверяем, попали ли по Юпитеру
+            const mouse = new THREE.Vector2();
+            mouse.x = (x / rect.width) * 2 - 1;
+            mouse.y = -(y / rect.height) * 2 + 1;
             
             const raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
@@ -699,138 +949,136 @@
                 const intersects = raycaster.intersectObject(jupiter);
                 
                 if (intersects.length > 0) {
-                    handleJupiterTap(x, y);
+                    processJupiterTap(x, y);
                 }
             }
         }
         
-        function handleJupiterTap(x, y) {
-            // Эффект клика
-            createClickEffect(x, y);
+        function processJupiterTap(x, y) {
+            // Создаем эффект клика
+            createClickRipple(x, y);
             
             // Увеличиваем счетчик
             tapCount++;
+            document.getElementById('tapCounter').textContent = tapCount;
             
-            // Обновляем UI
-            document.getElementById('counter').textContent = `${tapCount}/${CONFIG.tapTarget}`;
-            document.getElementById('progressBar').style.width = `${(tapCount / CONFIG.tapTarget) * 100}%`;
+            // Обновляем прогресс-бар
+            const progress = (tapCount / CONFIG.requiredTaps) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
             
-            // Эффект пульсации
-            pulseJupiter();
-            
-            // Проверка на взрыв
-            if (tapCount >= CONFIG.tapTarget && !isExploded) {
+            // Проверяем, достигли ли 100 кликов
+            if (tapCount === CONFIG.requiredTaps) {
                 explodeJupiter();
             }
+            
+            console.log(`Секретный счетчик: ${tapCount}/100`);
         }
         
-        function createClickEffect(x, y) {
-            const effect = document.createElement('div');
-            effect.className = 'click-effect';
-            effect.style.left = `${x}px`;
-            effect.style.top = `${y}px`;
-            document.body.appendChild(effect);
+        function createClickRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'click-ripple';
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            document.body.appendChild(ripple);
             
             setTimeout(() => {
-                if (effect.parentNode) {
-                    effect.parentNode.removeChild(effect);
+                if (ripple.parentNode) {
+                    ripple.parentNode.removeChild(ripple);
                 }
-            }, 600);
+            }, 800);
         }
         
-        function pulseJupiter() {
-            if (!jupiter) return;
-            
-            const originalScale = jupiter.scale.clone();
-            const pulseScale = 1.05;
-            
-            let scale = 1;
-            let direction = 1;
-            const speed = 0.05;
-            
-            function animatePulse() {
-                scale += direction * speed;
-                
-                if (scale >= pulseScale) {
-                    direction = -1;
-                } else if (scale <= 1) {
-                    return;
-                }
-                
-                jupiter.scale.copy(originalScale.clone().multiplyScalar(scale));
-                requestAnimationFrame(animatePulse);
-            }
-            
-            animatePulse();
-        }
-        
+        // ============ ВЗРЫВ ЮПИТЕРА ============
         function explodeJupiter() {
+            if (isExploded) return;
             isExploded = true;
+            
+            console.log('💥 ВЗРЫВ ЮПИТЕРА НА 100 КЛИКЕ!');
+            
+            // Отключаем авто-вращение
+            autoRotate = false;
+            clearTimeout(autoRotateTimeout);
+            
+            // Показываем вспышку
+            const flash = document.getElementById('explosionFlash');
+            flash.style.opacity = '0.8';
+            setTimeout(() => {
+                flash.style.opacity = '0';
+            }, 500);
             
             // Показываем текст
             document.getElementById('explosionText').classList.add('visible');
             
             // Создаем сердечки
-            createHearts();
+            createHeartParticles();
             
             // Создаем частицы взрыва
             createExplosionParticles();
             
-            // Убираем Юпитер
+            // Удаляем оригинальный Юпитер с задержкой
             setTimeout(() => {
                 if (jupiter) scene.remove(jupiter);
                 if (atmosphere) scene.remove(atmosphere);
                 if (rings) scene.remove(rings);
                 
-                // Тряска камеры
+                // Сотрясение камеры
                 shakeCamera();
-            }, 500);
+            }, 300);
             
-            // Восстановление через 5 секунд
+            // Восстанавливаем через 7 секунд
             setTimeout(() => {
                 resetJupiter();
-            }, 5000);
+            }, 7000);
         }
         
         function createExplosionParticles() {
-            const count = 500;
             const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(count * 3);
-            const colors = new Float32Array(count * 3);
+            const positions = new Float32Array(CONFIG.explosionParticleCount * 3);
+            const colors = new Float32Array(CONFIG.explosionParticleCount * 3);
             const velocities = [];
             
-            for(let i = 0; i < count; i++) {
+            for(let i = 0; i < CONFIG.explosionParticleCount; i++) {
                 const i3 = i * 3;
                 
-                // Начальная позиция на Юпитере
+                // Начальная позиция на поверхности Юпитера
                 const phi = Math.random() * Math.PI * 2;
                 const theta = Math.random() * Math.PI;
-                const radius = 4;
+                const radius = CONFIG.jupiterRadius;
                 
                 positions[i3] = radius * Math.sin(theta) * Math.cos(phi);
                 positions[i3 + 1] = radius * Math.cos(theta);
                 positions[i3 + 2] = radius * Math.sin(theta) * Math.sin(phi);
                 
-                // Цвета взрыва
-                const type = Math.random();
-                if(type < 0.4) {
+                // Цвета частиц взрыва
+                const colorType = Math.random();
+                if(colorType < 0.3) {
+                    // Красные
                     colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.3;
-                    colors[i3 + 2] = 0.3;
-                } else if(type < 0.7) {
+                    colors[i3 + 1] = 0.2 + Math.random() * 0.1;
+                    colors[i3 + 2] = 0.2;
+                } else if(colorType < 0.6) {
+                    // Оранжевые
                     colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.6;
+                    colors[i3 + 1] = 0.5 + Math.random() * 0.2;
                     colors[i3 + 2] = 0.0;
-                } else {
+                } else if(colorType < 0.8) {
+                    // Желтые
                     colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.9;
+                    colors[i3 + 1] = 0.9 + Math.random() * 0.1;
                     colors[i3 + 2] = 0.3;
+                } else {
+                    // Белые (горячие)
+                    colors[i3] = 1.0;
+                    colors[i3 + 1] = 1.0;
+                    colors[i3 + 2] = 1.0;
                 }
                 
+                // Случайная скорость и направление
                 velocities.push({
-                    x: (Math.random() - 0.5) * 0.3,
-                    y: (Math.random() - 0.5) * 0.3,
-                    z: (Math.random() - 0.5) * 0.3
+                    x: (Math.random() - 0.5) * 0.25,
+                    y: (Math.random() - 0.5) * 0.25,
+                    z: (Math.random() - 0.5) * 0.25,
+                    life: 120 + Math.random() * 60
                 });
             }
             
@@ -840,25 +1088,27 @@
             const material = new THREE.PointsMaterial({
                 size: 0.3,
                 vertexColors: true,
-                transparent: true
+                transparent: true,
+                blending: THREE.AdditiveBlending
             });
             
             const particleSystem = new THREE.Points(geometry, material);
-            particleSystem.userData = { velocities, life: 100 };
+            particleSystem.userData = { velocities };
             scene.add(particleSystem);
             explosionParticles.push(particleSystem);
         }
         
-        function createHearts() {
-            for(let i = 0; i < 30; i++) {
+        function createHeartParticles() {
+            for(let i = 0; i < CONFIG.heartCount; i++) {
                 setTimeout(() => {
                     const heart = document.createElement('div');
-                    heart.className = 'heart';
+                    heart.className = 'heart-particle';
                     heart.innerHTML = '❤️';
                     heart.style.left = `${Math.random() * 100}vw`;
                     heart.style.top = `${Math.random() * 100}vh`;
-                    heart.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
-                    heart.style.fontSize = `${Math.random() * 20 + 20}px`;
+                    heart.style.setProperty('--tx', `${(Math.random() - 0.5) * 250}px`);
+                    heart.style.fontSize = `${Math.random() * 30 + 25}px`;
+                    heart.style.opacity = '1';
                     
                     document.body.appendChild(heart);
                     
@@ -867,22 +1117,23 @@
                             heart.parentNode.removeChild(heart);
                         }
                     }, 2000);
-                }, i * 50);
+                }, i * 30); // Разнесем появление
             }
         }
         
         function shakeCamera() {
             const originalPosition = camera.position.clone();
-            const intensity = 0.3;
+            const intensity = 0.4;
             let time = 0;
             
             function shake() {
-                if (time < 1) {
+                if (time < 1.5) {
                     time += 0.02;
-                    const progress = 1 - time;
+                    const progress = 1 - (time / 1.5);
                     
                     camera.position.x = originalPosition.x + (Math.random() - 0.5) * intensity * progress;
                     camera.position.y = originalPosition.y + (Math.random() - 0.5) * intensity * progress;
+                    camera.position.z = originalPosition.z + (Math.random() - 0.5) * intensity * progress * 0.5;
                     
                     requestAnimationFrame(shake);
                 } else {
@@ -898,93 +1149,120 @@
             tapCount = 0;
             
             // Сбрасываем UI
-            document.getElementById('counter').textContent = `0/${CONFIG.tapTarget}`;
+            document.getElementById('tapCounter').textContent = '0';
             document.getElementById('progressBar').style.width = '0%';
             document.getElementById('explosionText').classList.remove('visible');
             
-            // Убираем частицы взрыва
-            explosionParticles.forEach(particle => {
-                scene.remove(particle);
+            // Удаляем частицы взрыва
+            explosionParticles.forEach(particleSystem => {
+                scene.remove(particleSystem);
             });
             explosionParticles = [];
+            
+            // Включаем авто-вращение
+            autoRotate = true;
             
             // Воссоздаем Юпитер
             createJupiter();
             createAtmosphere();
             createRings();
+            
+            console.log('🔄 Юпитер восстановлен!');
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
         
         // ============ АНИМАЦИЯ ============
         function animate() {
             requestAnimationFrame(animate);
             
-            // Автовращение
-            if (jupiter && !isExploded) {
-                jupiter.rotation.y += 0.005;
-                if (atmosphere) atmosphere.rotation.y += 0.006;
-                if (rings) rings.rotation.z += 0.002;
-            }
+            const time = Date.now() * 0.001;
             
-            // Вращение частиц
-            if (particles) {
-                particles.rotation.y += 0.001;
+            // Авто-вращение
+            if (jupiter && autoRotate && !isExploded) {
+                jupiter.rotation.y += 0.005 * CONFIG.autoRotateSpeed;
+                if (atmosphere) atmosphere.rotation.y = jupiter.rotation.y;
             }
             
             // Вращение звезд
             if (stars) {
+                stars.material.uniforms.time.value = time;
                 stars.rotation.y += 0.0001;
             }
             
+            // Вращение колец
+            if (rings && !isExploded) {
+                rings.rotation.z += 0.001;
+            }
+            
+            // Вращение астероидов
+            if (particles && !isExploded) {
+                particles.rotation.y += 0.0005;
+            }
+            
+            // Движение Солнца
+            const sunAngle = time * 0.03;
+            const sunDistance = 25;
+            
+            scene.children.forEach(child => {
+                if (child.isLight && child.position.length() > 20) {
+                    child.position.x = Math.cos(sunAngle) * sunDistance;
+                    child.position.z = Math.sin(sunAngle) * sunDistance;
+                    
+                    // Обновляем видимое солнце
+                    const sun = scene.children.find(c => 
+                        c.isMesh && c.position.distanceTo(child.position) < 5);
+                    if (sun) {
+                        sun.position.copy(child.position);
+                    }
+                }
+            });
+            
             // Анимация частиц взрыва
             explosionParticles.forEach((particleSystem, index) => {
-                if (particleSystem.userData.life > 0) {
-                    particleSystem.userData.life--;
+                const positions = particleSystem.geometry.attributes.position.array;
+                const velocities = particleSystem.userData.velocities;
+                
+                for(let i = 0; i < positions.length; i += 3) {
+                    const particleIndex = i / 3;
+                    const vel = velocities[particleIndex];
                     
-                    const positions = particleSystem.geometry.attributes.position.array;
-                    const velocities = particleSystem.userData.velocities;
-                    
-                    for(let i = 0; i < positions.length; i += 3) {
-                        const idx = i / 3;
-                        const vel = velocities[idx];
+                    if (vel.life > 0) {
+                        vel.life -= 1;
                         
+                        // Обновляем позицию
                         positions[i] += vel.x;
                         positions[i + 1] += vel.y;
                         positions[i + 2] += vel.z;
                         
                         // Гравитация
-                        vel.y -= 0.005;
+                        vel.y -= 0.003;
                         
                         // Замедление
                         vel.x *= 0.99;
                         vel.y *= 0.99;
                         vel.z *= 0.99;
-                    }
-                    
-                    particleSystem.geometry.attributes.position.needsUpdate = true;
-                    
-                    if (particleSystem.userData.life <= 0) {
-                        scene.remove(particleSystem);
-                        explosionParticles.splice(index, 1);
+                        
+                        // Эффект исчезновения
+                        const lifeFactor = vel.life / 120;
+                        if (lifeFactor < 0.3) {
+                            positions[i] *= 0.99;
+                            positions[i + 1] *= 0.99;
+                            positions[i + 2] *= 0.99;
+                        }
                     }
                 }
-            });
-            
-            // Движение Солнца
-            const time = Date.now() * 0.0001;
-            const sunDistance = 15;
-            
-            // Находим солнце и свет
-            scene.children.forEach(child => {
-                if (child.isLight && child.position.length() > 10) {
-                    child.position.x = Math.cos(time) * sunDistance;
-                    child.position.z = Math.sin(time) * sunDistance;
-                    
-                    // Обновляем видимое солнце
-                    const sun = scene.children.find(c => 
-                        c.isMesh && c.position.distanceTo(child.position) < 3);
-                    if (sun) {
-                        sun.position.copy(child.position);
-                    }
+                
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+                
+                // Удаляем систему когда все частицы умерли
+                if (velocities.every(v => v.life <= 0)) {
+                    scene.remove(particleSystem);
+                    explosionParticles.splice(index, 1);
                 }
             });
             
@@ -993,7 +1271,6 @@
         }
         
         // ============ ЗАПУСК ============
-        // Проверка WebGL
         function checkWebGL() {
             try {
                 const canvas = document.createElement('canvas');
@@ -1007,8 +1284,12 @@
         if (checkWebGL()) {
             init();
         } else {
-            document.getElementById('loading').innerHTML = 
-                '<div style="text-align: center; color: #ff4444;">WebGL не поддерживается</div>';
+            document.getElementById('loading').innerHTML = `
+                <div style="text-align: center; color: #ff4444; padding: 20px;">
+                    <h2>⚠️ WebGL не поддерживается</h2>
+                    <p>Обновите браузер или используйте Chrome/Firefox</p>
+                </div>
+            `;
         }
     </script>
 </body>

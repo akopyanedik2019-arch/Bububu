@@ -3,1294 +3,577 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Юпитер - Космическая красота</title>
+    <title>Интерактивная система Юпитера</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
-
+        
         body {
-            background: #000000;
-            overflow: hidden;
+            background: #000;
+            color: #fff;
             font-family: 'Arial', sans-serif;
-            height: 100vh;
-            width: 100vw;
-            cursor: grab;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body:active {
-            cursor: grabbing;
-        }
-
-        #container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            color: #ff9a3c;
-            font-size: 20px;
-            flex-direction: column;
-            gap: 20px;
-            transition: opacity 1s;
+            height: 100vh;
         }
-
-        .loading.hidden {
-            opacity: 0;
-            pointer-events: none;
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 154, 60, 0.2);
-            border-top: 4px solid #ff9a3c;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        
+        canvas {
+            display: block;
+            background: #000;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Скрытые элементы */
-        .hidden-element {
+        
+        .ui {
             position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            z-index: -1;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(0, 10, 30, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #2a4a7a;
+            box-shadow: 0 0 20px rgba(0, 100, 255, 0.3);
+            min-width: 220px;
         }
-
-        /* Эффект взрыва */
+        
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #4af;
+            text-shadow: 0 0 10px rgba(0, 150, 255, 0.7);
+        }
+        
+        .counter {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ff6;
+            text-align: center;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 200, 0, 0.7);
+        }
+        
+        .instructions {
+            font-size: 0.9rem;
+            color: #aaf;
+            line-height: 1.4;
+            margin-top: 10px;
+        }
+        
         .explosion-text {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 120px;
-            font-weight: 900;
-            color: #ff0066;
-            text-shadow: 
-                0 0 30px #ff0066,
-                0 0 60px #ff3366,
-                0 0 90px #ff6699,
-                0 0 120px #ff99cc;
-            z-index: 2000;
+            font-size: 4rem;
+            font-weight: bold;
+            color: #f00;
+            text-shadow: 0 0 30px #ff0, 0 0 60px #f00;
             opacity: 0;
-            pointer-events: none;
-            font-family: 'Impact', 'Arial Black', sans-serif;
-            text-align: center;
-            line-height: 1.2;
-            letter-spacing: 2px;
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            filter: blur(0);
-        }
-
-        .explosion-text.visible {
-            opacity: 1;
-            animation: textBoom 2.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        @keyframes textBoom {
-            0% {
-                transform: translate(-50%, -50%) scale(0.1) rotate(-180deg);
-                opacity: 0;
-                filter: blur(50px) brightness(10);
-            }
-            15% {
-                transform: translate(-50%, -50%) scale(1.4) rotate(15deg);
-                opacity: 1;
-                filter: blur(0) brightness(3);
-            }
-            30% {
-                transform: translate(-50%, -50%) scale(1) rotate(-8deg);
-                filter: blur(0) brightness(2);
-            }
-            45% {
-                transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
-                filter: blur(0) brightness(1.5);
-            }
-            60% {
-                transform: translate(-50%, -50%) scale(1) rotate(0);
-                filter: blur(0) brightness(1.2);
-            }
-            75% {
-                transform: translate(-50%, -50%) scale(1.05);
-                filter: blur(0) brightness(1.1);
-            }
-            90% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-                filter: blur(0) brightness(1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(0.9);
-                opacity: 0;
-                filter: blur(20px) brightness(0.5);
-            }
-        }
-
-        .heart-particle {
-            position: absolute;
-            font-size: 40px;
-            opacity: 0;
-            z-index: 1000;
-            pointer-events: none;
-            filter: drop-shadow(0 0 15px rgba(255, 51, 102, 0.8));
-            animation: heartFly 2s ease-out forwards;
-        }
-
-        @keyframes heartFly {
-            0% {
-                transform: translate(0, 0) scale(0) rotate(0deg);
-                opacity: 0;
-            }
-            20% {
-                transform: translate(var(--tx), -30px) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(calc(var(--tx) * 1.5), -120px) scale(1.2) rotate(180deg);
-                opacity: 0.8;
-            }
-            80% {
-                transform: translate(calc(var(--tx) * 2), -180px) scale(0.8) rotate(360deg);
-                opacity: 0.3;
-            }
-            100% {
-                transform: translate(calc(var(--tx) * 2.5), -250px) scale(0) rotate(450deg);
-                opacity: 0;
-            }
-        }
-
-        .click-ripple {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 154, 60, 0.6) 0%, rgba(255, 154, 60, 0) 70%);
-            pointer-events: none;
             z-index: 100;
-            transform: translate(-50%, -50%);
-            animation: rippleExpand 0.8s ease-out forwards;
-        }
-
-        @keyframes rippleExpand {
-            0% {
-                width: 0;
-                height: 0;
-                opacity: 0.8;
-                box-shadow: 0 0 0 0 rgba(255, 154, 60, 0.4);
-            }
-            100% {
-                width: 150px;
-                height: 150px;
-                opacity: 0;
-                box-shadow: 0 0 0 100px rgba(255, 154, 60, 0);
-            }
-        }
-
-        /* Индикатор прогресса (только при наведении) */
-        .secret-progress {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 80px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 2px;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 100;
-        }
-
-        .secret-progress:hover {
-            opacity: 0.3;
-        }
-
-        .secret-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #ff9a3c, #ff3366);
-            border-radius: 2px;
-            transition: width 0.3s ease-out;
-        }
-
-        /* Подсказка управления */
-        .controls-hint {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 14px;
             text-align: center;
-            z-index: 10;
-            pointer-events: none;
-            padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 154, 60, 0.1);
-            font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-            transition: all 1s ease;
+            animation: pulse 1.5s infinite alternate;
         }
-
-        .controls-hint.fade {
-            opacity: 0.1;
-            transform: translateX(-50%) translateY(10px);
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.1); }
         }
-
-        /* Вспышка при взрыве */
-        .explosion-flash {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, 
-                rgba(255, 100, 0, 0.8) 0%,
-                rgba(255, 50, 0, 0.4) 30%,
-                rgba(255, 0, 0, 0) 70%);
-            z-index: 1500;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
+        
+        .warning {
+            color: #f88;
+            font-size: 0.9rem;
+            margin-top: 5px;
         }
-
+        
         @media (max-width: 768px) {
-            .explosion-text {
-                font-size: 80px;
-            }
-            
-            .controls-hint {
-                font-size: 12px;
-                bottom: 20px;
-                padding: 10px 15px;
-            }
-            
-            .secret-progress {
-                bottom: 10px;
+            .ui {
+                top: 10px;
+                left: 10px;
                 right: 10px;
-                width: 60px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .explosion-text {
-                font-size: 60px;
+                padding: 10px;
             }
             
-            .controls-hint {
-                font-size: 11px;
-                bottom: 15px;
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .explosion-text {
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Загрузка -->
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div>🌌 Инициализация космической сцены...</div>
+    <div class="container">
+        <canvas id="spaceCanvas"></canvas>
+        <div class="ui">
+            <h1>Интерактивная система Юпитера</h1>
+            <div class="counter">Кликов: <span id="clickCount">0</span>/50</div>
+            <div class="instructions">Кликайте по Юпитеру. После 50 кликов произойдет взрыв!</div>
+            <div class="warning">Внимание: взрыв рассеет спутники!</div>
+        </div>
+        <div id="explosionText" class="explosion-text">Соси бибиджонус❤️</div>
     </div>
 
-    <!-- Скрытые элементы -->
-    <div class="hidden-element" id="tapCounter">0</div>
-    <div class="secret-progress" id="secretProgress">
-        <div class="secret-progress-bar" id="progressBar"></div>
-    </div>
-
-    <!-- Эффекты взрыва -->
-    <div class="explosion-flash" id="explosionFlash"></div>
-    <div class="explosion-text" id="explosionText">sosat bibijon❤️</div>
-
-    <!-- Подсказка -->
-    <div class="controls-hint" id="controlsHint">
-        ЛКМ: ВРАЩЕНИЕ • КОЛЕСО: МАСШТАБ • ДВА ПАЛЬЦА: ПРИБЛИЖЕНИЕ
-    </div>
-
-    <!-- Контейнер для Three.js -->
-    <div id="container"></div>
-
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
     <script>
-        // ============ КОНФИГУРАЦИЯ ============
-        const CONFIG = {
-            requiredTaps: 100,           // Ровно 100 кликов для взрыва
-            autoRotateSpeed: 0.3,        // Скорость автоматического вращения
-            manualRotateSpeed: 0.8,      // Скорость вращения при drag
-            zoomSpeed: 0.001,            // Скорость зума
-            starCount: 5000,             // Количество звезд
-            asteroidCount: 2000,         // Количество астероидов
-            explosionParticleCount: 800, // Частиц при взрыве
-            heartCount: 60,              // Количество сердечек
-            jupiterRadius: 5,            // Радиус Юпитера
-            ringInnerRadius: 7,          // Внутренний радиус колец
-            ringOuterRadius: 11,         // Внешний радиус колец
-            cameraDistance: 18,          // Расстояние камеры
-            cameraMinDistance: 6,        // Минимальное приближение
-            cameraMaxDistance: 40        // Максимальное отдаление
+        // Получаем элементы DOM
+        const canvas = document.getElementById('spaceCanvas');
+        const ctx = canvas.getContext('2d');
+        const clickCountElement = document.getElementById('clickCount');
+        const explosionText = document.getElementById('explosionText');
+        
+        // Настройки canvas
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        
+        // Переменные состояния
+        let clickCount = 0;
+        let explosionActive = false;
+        let explosionTime = 0;
+        const explosionDuration = 3000; // 3 секунды анимации взрыва
+        let particles = [];
+        
+        // Настройки звездного фона
+        const stars = [];
+        const starCount = 400;
+        
+        // Настройки Юпитера
+        const jupiter = {
+            x: width / 2,
+            y: height / 2,
+            radius: Math.min(width, height) * 0.15,
+            rotation: 0,
+            rotationSpeed: 0.001,
+            glow: 0
         };
-
-        // ============ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
-        let scene, camera, renderer;
-        let jupiter, atmosphere, rings, particles, stars;
-        let tapCount = 0;
-        let isExploded = false;
-        let explosionParticles = [];
-        let lastTapTime = 0;
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let autoRotate = true;
-        let autoRotateTimeout;
-
-        // ============ ИНИЦИАЛИЗАЦИЯ ============
-        function init() {
-            console.log('🚀 Инициализация сцены...');
-            
-            // 1. Создаем сцену
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000010);
-            
-            // 2. Настраиваем камеру
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 0, CONFIG.cameraDistance);
-            
-            // 3. Создаем рендерер с балансом качества/производительности
-            renderer = new THREE.WebGLRenderer({ 
-                antialias: true,
-                alpha: true,
-                powerPreference: "high-performance"
-            });
-            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.2;
-            document.getElementById('container').appendChild(renderer.domElement);
-            
-            // 4. Создаем все объекты с хорошей детализацией
-            createStarField();
-            createJupiter();
-            createAtmosphere();
-            createRings();
-            createAsteroidBelt();
-            createLighting();
-            
-            // 5. Настраиваем обработчики событий
-            setupEventListeners();
-            
-            // 6. Скрываем загрузку
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-                // Скрываем подсказку через 8 секунд
-                setTimeout(() => {
-                    document.getElementById('controlsHint').classList.add('fade');
-                }, 8000);
-            }, 2000);
-            
-            // 7. Запускаем анимацию
-            animate();
-        }
         
-        // ============ СОЗДАНИЕ ОБЪЕКТОВ ============
-        function createStarField() {
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(CONFIG.starCount * 3);
-            const colors = new Float32Array(CONFIG.starCount * 3);
-            const sizes = new Float32Array(CONFIG.starCount);
-            
-            for(let i = 0; i < CONFIG.starCount; i++) {
-                const i3 = i * 3;
-                
-                // Сферическое распределение
-                const radius = 500 + Math.random() * 1000;
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos((Math.random() * 2) - 1);
-                
-                positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-                positions[i3 + 1] = radius * Math.cos(phi);
-                positions[i3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-                
-                // Реалистичные цвета звезд
-                const temperature = Math.random();
-                if(temperature < 0.6) {
-                    colors[i3] = 0.8;
-                    colors[i3 + 1] = 0.85;
-                    colors[i3 + 2] = 1.0;
-                } else if(temperature < 0.85) {
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.95;
-                    colors[i3 + 2] = 0.9;
-                } else if(temperature < 0.95) {
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.85;
-                    colors[i3 + 2] = 0.7;
-                } else {
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.7;
-                    colors[i3 + 2] = 0.5;
-                }
-                
-                sizes[i] = Math.random() * 2 + 0.5;
-            }
-            
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-            
-            const material = new THREE.ShaderMaterial({
-                uniforms: {
-                    time: { value: 0.0 }
-                },
-                vertexShader: `
-                    attribute float size;
-                    attribute vec3 color;
-                    varying vec3 vColor;
-                    uniform float time;
-                    
-                    void main() {
-                        vColor = color;
-                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                        
-                        // Легкое мерцание
-                        float flicker = sin(time * 2.0 + float(gl_VertexID) * 0.01) * 0.1 + 0.9;
-                        
-                        gl_PointSize = size * (300.0 / -mvPosition.z) * flicker;
-                        gl_Position = projectionMatrix * mvPosition;
-                    }
-                `,
-                fragmentShader: `
-                    varying vec3 vColor;
-                    
-                    void main() {
-                        float r = distance(gl_PointCoord, vec2(0.5, 0.5));
-                        if(r > 0.5) discard;
-                        
-                        float alpha = 1.0 - smoothstep(0.0, 0.5, r);
-                        gl_FragColor = vec4(vColor, alpha);
-                    }
-                `,
-                transparent: true,
-                blending: THREE.AdditiveBlending
-            });
-            
-            stars = new THREE.Points(geometry, material);
-            scene.add(stars);
-        }
+        // Настройки спутников
+        const moons = [
+            { name: "Ио", distance: 180, radius: 8, speed: 0.02, angle: 0, color: "#ff9966", orbitColor: "rgba(255, 150, 100, 0.1)" },
+            { name: "Европа", distance: 240, radius: 7, speed: 0.015, angle: Math.PI / 2, color: "#aaaaff", orbitColor: "rgba(170, 170, 255, 0.1)" },
+            { name: "Ганимед", distance: 300, radius: 12, speed: 0.01, angle: Math.PI, color: "#cccccc", orbitColor: "rgba(200, 200, 200, 0.1)" },
+            { name: "Каллисто", distance: 360, radius: 11, speed: 0.008, angle: 3 * Math.PI / 2, color: "#aaaaaa", orbitColor: "rgba(180, 180, 180, 0.1)" }
+        ];
         
-        function createJupiter() {
-            console.log('🪐 Создание Юпитера...');
-            
-            // Геометрия с хорошей детализацией
-            const geometry = new THREE.SphereGeometry(CONFIG.jupiterRadius, 96, 96);
-            
-            // Создаем качественную текстуру
-            const texture = createJupiterTexture();
-            
-            const material = new THREE.MeshStandardMaterial({
-                map: texture,
-                roughness: 0.7,
-                metalness: 0.2,
-                emissive: new THREE.Color(0x221100),
-                emissiveIntensity: 0.05
-            });
-            
-            jupiter = new THREE.Mesh(geometry, material);
-            jupiter.castShadow = true;
-            jupiter.receiveShadow = true;
-            scene.add(jupiter);
-        }
+        // Настройки колец Юпитера
+        const rings = {
+            innerRadius: jupiter.radius * 1.5,
+            outerRadius: jupiter.radius * 2.2,
+            rotation: 0,
+            rotationSpeed: 0.0005
+        };
         
-        function createJupiterTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1536; // Хороший баланс качества
-            canvas.height = 768;
-            const ctx = canvas.getContext('2d');
-            
-            // Создаем основной градиент
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            gradient.addColorStop(0.0, '#FFE5B4');
-            gradient.addColorStop(0.15, '#FFD8A8');
-            gradient.addColorStop(0.35, '#FFB347');
-            gradient.addColorStop(0.55, '#FF8C42');
-            gradient.addColorStop(0.75, '#E68A2E');
-            gradient.addColorStop(0.9, '#CC6E1D');
-            gradient.addColorStop(1.0, '#B35917');
-            
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Рисуем атмосферные полосы
-            ctx.strokeStyle = 'rgba(139, 69, 19, 0.85)';
-            ctx.lineWidth = 18;
-            
-            for(let i = 0; i < 8; i++) {
-                const y = i * 90 + 40;
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.bezierCurveTo(
-                    canvas.width * 0.3, y + Math.random() * 25 - 12.5,
-                    canvas.width * 0.7, y + Math.random() * 25 - 12.5,
-                    canvas.width, y
-                );
-                ctx.stroke();
-            }
-            
-            // Большое Красное Пятно с деталями
-            const spotX = canvas.width * 0.72;
-            const spotY = canvas.height * 0.38;
-            const spotWidth = 100;
-            const spotHeight = 45;
-            
-            // Основное пятно
-            ctx.fillStyle = '#8B0000';
-            ctx.beginPath();
-            ctx.ellipse(spotX, spotY, spotWidth, spotHeight, Math.PI/5, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Внутренняя часть
-            ctx.fillStyle = '#A52A2A';
-            ctx.beginPath();
-            ctx.ellipse(spotX, spotY, spotWidth * 0.7, spotHeight * 0.7, Math.PI/5, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Детали пятна
-            ctx.strokeStyle = '#FF4500';
-            ctx.lineWidth = 3;
-            ctx.globalAlpha = 0.6;
-            
-            for(let i = 0; i < 6; i++) {
-                const angle = (i / 6) * Math.PI * 2;
-                const radius = spotWidth * 0.6;
-                
-                ctx.beginPath();
-                ctx.arc(
-                    spotX + Math.cos(angle) * radius * 0.5,
-                    spotY + Math.sin(angle) * radius * 0.5,
-                    radius * 0.2,
-                    angle - Math.PI/3,
-                    angle + Math.PI/3
-                );
-                ctx.stroke();
-            }
-            ctx.globalAlpha = 1;
-            
-            // Атмосферные вихри
-            ctx.globalAlpha = 0.7;
-            for(let i = 0; i < 25; i++) {
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const size = Math.random() * 35 + 15;
-                
-                // Пропускаем если попадает на пятно
-                const distToSpot = Math.sqrt(Math.pow(x - spotX, 2) + Math.pow(y - spotY, 2));
-                if(distToSpot < 150) continue;
-                
-                const colors = ['#FF6347', '#FF4500', '#FF8C00', '#DC143C'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Спиральные линии
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                for(let j = 0; j < size * 2; j += 2) {
-                    const angle = j * 0.2;
-                    const radius = j * 0.5;
-                    
-                    const spiralX = x + Math.cos(angle) * radius;
-                    const spiralY = y + Math.sin(angle) * radius;
-                    
-                    if(j === 0) {
-                        ctx.moveTo(spiralX, spiralY);
-                    } else {
-                        ctx.lineTo(spiralX, spiralY);
-                    }
-                }
-                ctx.stroke();
-            }
-            ctx.globalAlpha = 1;
-            
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping;
-            
-            return texture;
-        }
-        
-        function createAtmosphere() {
-            const geometry = new THREE.SphereGeometry(CONFIG.jupiterRadius * 1.05, 64, 64);
-            
-            const material = new THREE.MeshBasicMaterial({
-                color: 0x4488ff,
-                transparent: true,
-                opacity: 0.08,
-                side: THREE.BackSide,
-                blending: THREE.AdditiveBlending
-            });
-            
-            atmosphere = new THREE.Mesh(geometry, material);
-            scene.add(atmosphere);
-        }
-        
-        function createRings() {
-            // Основное кольцо
-            const ringGeometry = new THREE.RingGeometry(
-                CONFIG.ringInnerRadius, 
-                CONFIG.ringOuterRadius, 
-                128
-            );
-            
-            const ringMaterial = new THREE.MeshBasicMaterial({
-                color: 0xFFD8A8,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.07,
-                blending: THREE.AdditiveBlending
-            });
-            
-            rings = new THREE.Mesh(ringGeometry, ringMaterial);
-            rings.rotation.x = Math.PI / 4;
-            scene.add(rings);
-            
-            // Внутреннее тонкое кольцо
-            const innerRingGeometry = new THREE.RingGeometry(
-                CONFIG.ringInnerRadius - 1, 
-                CONFIG.ringInnerRadius, 
-                64
-            );
-            
-            const innerRingMaterial = new THREE.MeshBasicMaterial({
-                color: 0xFFB347,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.04
-            });
-            
-            const innerRings = new THREE.Mesh(innerRingGeometry, innerRingMaterial);
-            innerRings.rotation.x = Math.PI / 4.1;
-            scene.add(innerRings);
-        }
-        
-        function createAsteroidBelt() {
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(CONFIG.asteroidCount * 3);
-            const colors = new Float32Array(CONFIG.asteroidCount * 3);
-            const sizes = new Float32Array(CONFIG.asteroidCount);
-            
-            for(let i = 0; i < CONFIG.asteroidCount; i++) {
-                const i3 = i * 3;
-                
-                // Тороидальное распределение (пояс астероидов)
-                const radius = 18 + Math.random() * 25;
-                const angle = Math.random() * Math.PI * 2;
-                const spread = (Math.random() - 0.5) * 8;
-                
-                positions[i3] = Math.cos(angle) * radius + spread;
-                positions[i3 + 1] = (Math.random() - 0.5) * 15;
-                positions[i3 + 2] = Math.sin(angle) * radius + spread;
-                
-                // Разные типы астероидов
-                const asteroidType = Math.random();
-                if(asteroidType < 0.4) {
-                    // Ледяные
-                    colors[i3] = 0.9;
-                    colors[i3 + 1] = 0.95;
-                    colors[i3 + 2] = 1.0;
-                } else if(asteroidType < 0.7) {
-                    // Каменные
-                    colors[i3] = 0.8;
-                    colors[i3 + 1] = 0.7;
-                    colors[i3 + 2] = 0.6;
-                } else if(asteroidType < 0.9) {
-                    // Металлические
-                    colors[i3] = 0.9;
-                    colors[i3 + 1] = 0.9;
-                    colors[i3 + 2] = 0.8;
-                } else {
-                    // Углеродистые
-                    colors[i3] = 0.4;
-                    colors[i3 + 1] = 0.4;
-                    colors[i3 + 2] = 0.4;
-                }
-                
-                sizes[i] = Math.random() * 0.2 + 0.05;
-            }
-            
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-            
-            const material = new THREE.PointsMaterial({
-                size: 0.1,
-                vertexColors: true,
-                transparent: true,
-                sizeAttenuation: true
-            });
-            
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-        }
-        
-        function createLighting() {
-            // Основной солнечный свет
-            const sunLight = new THREE.DirectionalLight(0xFFFFFF, 1.5);
-            sunLight.position.set(20, 15, 15);
-            sunLight.castShadow = true;
-            scene.add(sunLight);
-            
-            // Заполняющий свет
-            const fillLight = new THREE.DirectionalLight(0xFFB347, 0.4);
-            fillLight.position.set(-10, -5, -5);
-            scene.add(fillLight);
-            
-            // Контровой свет
-            const backLight = new THREE.DirectionalLight(0xFFD8A8, 0.2);
-            backLight.position.set(-5, 5, -15);
-            scene.add(backLight);
-            
-            // Рассеянный свет
-            const ambientLight = new THREE.AmbientLight(0x333344, 0.1);
-            scene.add(ambientLight);
-            
-            // Видимое Солнце
-            const sunGeometry = new THREE.SphereGeometry(2.5, 24, 24);
-            const sunMaterial = new THREE.MeshBasicMaterial({
-                color: 0xFFFF00,
-                emissive: 0xFFFF00,
-                emissiveIntensity: 1.5
-            });
-            
-            const sun = new THREE.Mesh(sunGeometry, sunMaterial);
-            sun.position.copy(sunLight.position);
-            scene.add(sun);
-        }
-        
-        // ============ УПРАВЛЕНИЕ И СЧЕТЧИК ============
-        function setupEventListeners() {
-            // Мышь для вращения
-            renderer.domElement.addEventListener('mousedown', onMouseDown);
-            renderer.domElement.addEventListener('mousemove', onMouseMove);
-            renderer.domElement.addEventListener('mouseup', onMouseUp);
-            renderer.domElement.addEventListener('mouseleave', onMouseUp);
-            
-            // Колесико для зума
-            renderer.domElement.addEventListener('wheel', onMouseWheel);
-            
-            // Касания для мобильных
-            renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false });
-            renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: false });
-            renderer.domElement.addEventListener('touchend', onTouchEnd);
-            
-            // Клики для счетчика (только по Юпитеру)
-            renderer.domElement.addEventListener('click', handleClick);
-            
-            // Предотвращаем контекстное меню
-            renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
-            
-            // Ресайз окна
-            window.addEventListener('resize', onWindowResize);
-            
-            // Показываем прогресс при наведении
-            document.getElementById('secretProgress').addEventListener('mouseenter', () => {
-                document.getElementById('secretProgress').style.opacity = '0.3';
-            });
-            
-            document.getElementById('secretProgress').addEventListener('mouseleave', () => {
-                document.getElementById('secretProgress').style.opacity = '0';
-            });
-        }
-        
-        function onMouseDown(event) {
-            isDragging = true;
-            previousMousePosition = { x: event.clientX, y: event.clientY };
-            autoRotate = false;
-            clearTimeout(autoRotateTimeout);
-        }
-        
-        function onMouseMove(event) {
-            if (!isDragging || isExploded) return;
-            
-            const deltaX = event.clientX - previousMousePosition.x;
-            const deltaY = event.clientY - previousMousePosition.y;
-            
-            if (jupiter) {
-                jupiter.rotation.y += deltaX * CONFIG.manualRotateSpeed * 0.01;
-                jupiter.rotation.x += deltaY * CONFIG.manualRotateSpeed * 0.01;
-                
-                // Ограничиваем вращение по X
-                jupiter.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, jupiter.rotation.x));
-            }
-            
-            if (atmosphere) atmosphere.rotation.y = jupiter.rotation.y;
-            
-            previousMousePosition = { x: event.clientX, y: event.clientY };
-        }
-        
-        function onMouseUp() {
-            isDragging = false;
-            // Возвращаем авто-вращение через 3 секунды бездействия
-            autoRotateTimeout = setTimeout(() => {
-                autoRotate = true;
-            }, 3000);
-        }
-        
-        function onMouseWheel(event) {
-            event.preventDefault();
-            camera.position.z += event.deltaY * CONFIG.zoomSpeed;
-            camera.position.z = Math.max(CONFIG.cameraMinDistance, Math.min(CONFIG.cameraMaxDistance, camera.position.z));
-        }
-        
-        function onTouchStart(event) {
-            event.preventDefault();
-            if (event.touches.length === 1) {
-                isDragging = true;
-                previousMousePosition = { 
-                    x: event.touches[0].clientX, 
-                    y: event.touches[0].clientY 
-                };
-                autoRotate = false;
-                clearTimeout(autoRotateTimeout);
-            }
-        }
-        
-        function onTouchMove(event) {
-            event.preventDefault();
-            
-            if (event.touches.length === 1 && isDragging && !isExploded) {
-                const deltaX = event.touches[0].clientX - previousMousePosition.x;
-                const deltaY = event.touches[0].clientY - previousMousePosition.y;
-                
-                if (jupiter) {
-                    jupiter.rotation.y += deltaX * CONFIG.manualRotateSpeed * 0.01;
-                    jupiter.rotation.x += deltaY * CONFIG.manualRotateSpeed * 0.01;
-                    
-                    // Ограничиваем вращение по X
-                    jupiter.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, jupiter.rotation.x));
-                }
-                
-                if (atmosphere) atmosphere.rotation.y = jupiter.rotation.y;
-                
-                previousMousePosition = { 
-                    x: event.touches[0].clientX, 
-                    y: event.touches[0].clientY 
-                };
-            } else if (event.touches.length === 2) {
-                // Масштабирование двумя пальцами
-                const touch1 = event.touches[0];
-                const touch2 = event.touches[1];
-                
-                const currentDistance = Math.hypot(
-                    touch1.clientX - touch2.clientX,
-                    touch1.clientY - touch2.clientY
-                );
-                
-                camera.position.z += (currentDistance * 0.01);
-                camera.position.z = Math.max(CONFIG.cameraMinDistance, Math.min(CONFIG.cameraMaxDistance, camera.position.z));
-            }
-        }
-        
-        function onTouchEnd(event) {
-            if (event.touches.length === 0) {
-                isDragging = false;
-                // Возвращаем авто-вращение через 3 секунды
-                autoRotateTimeout = setTimeout(() => {
-                    autoRotate = true;
-                }, 3000);
-            }
-        }
-        
-        function handleClick(event) {
-            if (isExploded) return;
-            
-            const rect = renderer.domElement.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            
-            // Проверяем, попали ли по Юпитеру
-            const mouse = new THREE.Vector2();
-            mouse.x = (x / rect.width) * 2 - 1;
-            mouse.y = -(y / rect.height) * 2 + 1;
-            
-            const raycaster = new THREE.Raycaster();
-            raycaster.setFromCamera(mouse, camera);
-            
-            if (jupiter) {
-                const intersects = raycaster.intersectObject(jupiter);
-                
-                if (intersects.length > 0) {
-                    processJupiterTap(x, y);
-                }
-            }
-        }
-        
-        function processJupiterTap(x, y) {
-            // Создаем эффект клика
-            createClickRipple(x, y);
-            
-            // Увеличиваем счетчик
-            tapCount++;
-            document.getElementById('tapCounter').textContent = tapCount;
-            
-            // Обновляем прогресс-бар
-            const progress = (tapCount / CONFIG.requiredTaps) * 100;
-            document.getElementById('progressBar').style.width = `${progress}%`;
-            
-            // Проверяем, достигли ли 100 кликов
-            if (tapCount === CONFIG.requiredTaps) {
-                explodeJupiter();
-            }
-            
-            console.log(`Секретный счетчик: ${tapCount}/100`);
-        }
-        
-        function createClickRipple(x, y) {
-            const ripple = document.createElement('div');
-            ripple.className = 'click-ripple';
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            document.body.appendChild(ripple);
-            
-            setTimeout(() => {
-                if (ripple.parentNode) {
-                    ripple.parentNode.removeChild(ripple);
-                }
-            }, 800);
-        }
-        
-        // ============ ВЗРЫВ ЮПИТЕРА ============
-        function explodeJupiter() {
-            if (isExploded) return;
-            isExploded = true;
-            
-            console.log('💥 ВЗРЫВ ЮПИТЕРА НА 100 КЛИКЕ!');
-            
-            // Отключаем авто-вращение
-            autoRotate = false;
-            clearTimeout(autoRotateTimeout);
-            
-            // Показываем вспышку
-            const flash = document.getElementById('explosionFlash');
-            flash.style.opacity = '0.8';
-            setTimeout(() => {
-                flash.style.opacity = '0';
-            }, 500);
-            
-            // Показываем текст
-            document.getElementById('explosionText').classList.add('visible');
-            
-            // Создаем сердечки
-            createHeartParticles();
-            
-            // Создаем частицы взрыва
-            createExplosionParticles();
-            
-            // Удаляем оригинальный Юпитер с задержкой
-            setTimeout(() => {
-                if (jupiter) scene.remove(jupiter);
-                if (atmosphere) scene.remove(atmosphere);
-                if (rings) scene.remove(rings);
-                
-                // Сотрясение камеры
-                shakeCamera();
-            }, 300);
-            
-            // Восстанавливаем через 7 секунд
-            setTimeout(() => {
-                resetJupiter();
-            }, 7000);
-        }
-        
-        function createExplosionParticles() {
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(CONFIG.explosionParticleCount * 3);
-            const colors = new Float32Array(CONFIG.explosionParticleCount * 3);
-            const velocities = [];
-            
-            for(let i = 0; i < CONFIG.explosionParticleCount; i++) {
-                const i3 = i * 3;
-                
-                // Начальная позиция на поверхности Юпитера
-                const phi = Math.random() * Math.PI * 2;
-                const theta = Math.random() * Math.PI;
-                const radius = CONFIG.jupiterRadius;
-                
-                positions[i3] = radius * Math.sin(theta) * Math.cos(phi);
-                positions[i3 + 1] = radius * Math.cos(theta);
-                positions[i3 + 2] = radius * Math.sin(theta) * Math.sin(phi);
-                
-                // Цвета частиц взрыва
-                const colorType = Math.random();
-                if(colorType < 0.3) {
-                    // Красные
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.2 + Math.random() * 0.1;
-                    colors[i3 + 2] = 0.2;
-                } else if(colorType < 0.6) {
-                    // Оранжевые
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.5 + Math.random() * 0.2;
-                    colors[i3 + 2] = 0.0;
-                } else if(colorType < 0.8) {
-                    // Желтые
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 0.9 + Math.random() * 0.1;
-                    colors[i3 + 2] = 0.3;
-                } else {
-                    // Белые (горячие)
-                    colors[i3] = 1.0;
-                    colors[i3 + 1] = 1.0;
-                    colors[i3 + 2] = 1.0;
-                }
-                
-                // Случайная скорость и направление
-                velocities.push({
-                    x: (Math.random() - 0.5) * 0.25,
-                    y: (Math.random() - 0.5) * 0.25,
-                    z: (Math.random() - 0.5) * 0.25,
-                    life: 120 + Math.random() * 60
+        // Инициализация звездного фона
+        function initStars() {
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 1.5 + 0.5,
+                    brightness: Math.random() * 0.5 + 0.5,
+                    twinkleSpeed: Math.random() * 0.05 + 0.01,
+                    twinkleOffset: Math.random() * Math.PI * 2
                 });
             }
-            
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            
-            const material = new THREE.PointsMaterial({
-                size: 0.3,
-                vertexColors: true,
-                transparent: true,
-                blending: THREE.AdditiveBlending
-            });
-            
-            const particleSystem = new THREE.Points(geometry, material);
-            particleSystem.userData = { velocities };
-            scene.add(particleSystem);
-            explosionParticles.push(particleSystem);
         }
         
-        function createHeartParticles() {
-            for(let i = 0; i < CONFIG.heartCount; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'heart-particle';
-                    heart.innerHTML = '❤️';
-                    heart.style.left = `${Math.random() * 100}vw`;
-                    heart.style.top = `${Math.random() * 100}vh`;
-                    heart.style.setProperty('--tx', `${(Math.random() - 0.5) * 250}px`);
-                    heart.style.fontSize = `${Math.random() * 30 + 25}px`;
-                    heart.style.opacity = '1';
-                    
-                    document.body.appendChild(heart);
-                    
-                    setTimeout(() => {
-                        if (heart.parentNode) {
-                            heart.parentNode.removeChild(heart);
-                        }
-                    }, 2000);
-                }, i * 30); // Разнесем появление
+        // Создание частиц для взрыва
+        function createExplosionParticles() {
+            particles = [];
+            const particleCount = 300;
+            
+            for (let i = 0; i < particleCount; i++) {
+                // Разные типы частиц для разнообразия
+                const type = Math.random() > 0.7 ? "fire" : Math.random() > 0.5 ? "gas" : "debris";
+                
+                let color;
+                switch(type) {
+                    case "fire": color = `hsl(${30 + Math.random() * 20}, 100%, 60%)`; break;
+                    case "gas": color = `hsl(${200 + Math.random() * 40}, 80%, 70%)`; break;
+                    default: color = `hsl(${10 + Math.random() * 30}, 60%, 50%)`;
+                }
+                
+                particles.push({
+                    x: jupiter.x,
+                    y: jupiter.y,
+                    vx: (Math.random() - 0.5) * 15,
+                    vy: (Math.random() - 0.5) * 15,
+                    radius: Math.random() * 6 + 2,
+                    color: color,
+                    life: 1.0,
+                    decay: Math.random() * 0.02 + 0.005,
+                    type: type,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.2
+                });
             }
         }
         
-        function shakeCamera() {
-            const originalPosition = camera.position.clone();
-            const intensity = 0.4;
-            let time = 0;
+        // Обработчик изменения размера окна
+        function handleResize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
             
-            function shake() {
-                if (time < 1.5) {
-                    time += 0.02;
-                    const progress = 1 - (time / 1.5);
-                    
-                    camera.position.x = originalPosition.x + (Math.random() - 0.5) * intensity * progress;
-                    camera.position.y = originalPosition.y + (Math.random() - 0.5) * intensity * progress;
-                    camera.position.z = originalPosition.z + (Math.random() - 0.5) * intensity * progress * 0.5;
-                    
-                    requestAnimationFrame(shake);
-                } else {
-                    camera.position.copy(originalPosition);
+            // Обновляем позицию Юпитера
+            jupiter.x = width / 2;
+            jupiter.y = height / 2;
+            jupiter.radius = Math.min(width, height) * 0.15;
+            
+            // Обновляем параметры колец
+            rings.innerRadius = jupiter.radius * 1.5;
+            rings.outerRadius = jupiter.radius * 2.2;
+        }
+        
+        // Обработчик клика по canvas
+        function handleCanvasClick(e) {
+            if (explosionActive) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Проверяем, кликнули ли по Юпитеру
+            const distance = Math.sqrt((x - jupiter.x) ** 2 + (y - jupiter.y) ** 2);
+            
+            if (distance <= jupiter.radius * 1.2) { // Немного больше радиуса для удобства
+                clickCount++;
+                clickCountElement.textContent = clickCount;
+                
+                // Эффект при клике - свечение
+                jupiter.glow = 1.0;
+                
+                // Если достигли 50 кликов - активируем взрыв
+                if (clickCount >= 50) {
+                    activateExplosion();
                 }
             }
-            
-            shake();
         }
         
-        function resetJupiter() {
-            isExploded = false;
-            tapCount = 0;
+        // Активация взрыва
+        function activateExplosion() {
+            explosionActive = true;
+            explosionTime = 0;
+            explosionText.style.opacity = 1;
+            createExplosionParticles();
             
-            // Сбрасываем UI
-            document.getElementById('tapCounter').textContent = '0';
-            document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('explosionText').classList.remove('visible');
-            
-            // Удаляем частицы взрыва
-            explosionParticles.forEach(particleSystem => {
-                scene.remove(particleSystem);
+            // Рассеиваем спутники
+            moons.forEach(moon => {
+                moon.scattered = true;
+                moon.scatterVX = (Math.random() - 0.5) * 8;
+                moon.scatterVY = (Math.random() - 0.5) * 8;
+                moon.scatterRotation = (Math.random() - 0.5) * 0.1;
             });
-            explosionParticles = [];
-            
-            // Включаем авто-вращение
-            autoRotate = true;
-            
-            // Воссоздаем Юпитер
-            createJupiter();
-            createAtmosphere();
-            createRings();
-            
-            console.log('🔄 Юпитер восстановлен!');
         }
         
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        
-        // ============ АНИМАЦИЯ ============
-        function animate() {
-            requestAnimationFrame(animate);
+        // Отрисовка звездного фона
+        function drawStars() {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, width, height);
             
             const time = Date.now() * 0.001;
             
-            // Авто-вращение
-            if (jupiter && autoRotate && !isExploded) {
-                jupiter.rotation.y += 0.005 * CONFIG.autoRotateSpeed;
-                if (atmosphere) atmosphere.rotation.y = jupiter.rotation.y;
-            }
-            
-            // Вращение звезд
-            if (stars) {
-                stars.material.uniforms.time.value = time;
-                stars.rotation.y += 0.0001;
-            }
-            
-            // Вращение колец
-            if (rings && !isExploded) {
-                rings.rotation.z += 0.001;
-            }
-            
-            // Вращение астероидов
-            if (particles && !isExploded) {
-                particles.rotation.y += 0.0005;
-            }
-            
-            // Движение Солнца
-            const sunAngle = time * 0.03;
-            const sunDistance = 25;
-            
-            scene.children.forEach(child => {
-                if (child.isLight && child.position.length() > 20) {
-                    child.position.x = Math.cos(sunAngle) * sunDistance;
-                    child.position.z = Math.sin(sunAngle) * sunDistance;
-                    
-                    // Обновляем видимое солнце
-                    const sun = scene.children.find(c => 
-                        c.isMesh && c.position.distanceTo(child.position) < 5);
-                    if (sun) {
-                        sun.position.copy(child.position);
-                    }
-                }
+            stars.forEach(star => {
+                const twinkle = Math.sin(time * star.twinkleSpeed + star.twinkleOffset) * 0.3 + 0.7;
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness * twinkle})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
             });
-            
-            // Анимация частиц взрыва
-            explosionParticles.forEach((particleSystem, index) => {
-                const positions = particleSystem.geometry.attributes.position.array;
-                const velocities = particleSystem.userData.velocities;
-                
-                for(let i = 0; i < positions.length; i += 3) {
-                    const particleIndex = i / 3;
-                    const vel = velocities[particleIndex];
-                    
-                    if (vel.life > 0) {
-                        vel.life -= 1;
-                        
-                        // Обновляем позицию
-                        positions[i] += vel.x;
-                        positions[i + 1] += vel.y;
-                        positions[i + 2] += vel.z;
-                        
-                        // Гравитация
-                        vel.y -= 0.003;
-                        
-                        // Замедление
-                        vel.x *= 0.99;
-                        vel.y *= 0.99;
-                        vel.z *= 0.99;
-                        
-                        // Эффект исчезновения
-                        const lifeFactor = vel.life / 120;
-                        if (lifeFactor < 0.3) {
-                            positions[i] *= 0.99;
-                            positions[i + 1] *= 0.99;
-                            positions[i + 2] *= 0.99;
-                        }
-                    }
-                }
-                
-                particleSystem.geometry.attributes.position.needsUpdate = true;
-                
-                // Удаляем систему когда все частицы умерли
-                if (velocities.every(v => v.life <= 0)) {
-                    scene.remove(particleSystem);
-                    explosionParticles.splice(index, 1);
-                }
-            });
-            
-            // Рендеринг
-            renderer.render(scene, camera);
         }
         
-        // ============ ЗАПУСК ============
-        function checkWebGL() {
-            try {
-                const canvas = document.createElement('canvas');
-                return !!(window.WebGLRenderingContext && 
-                         (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
-            } catch (e) {
-                return false;
-            }
+        // Отрисовка орбит спутников
+        function drawOrbits() {
+            moons.forEach(moon => {
+                ctx.strokeStyle = moon.orbitColor;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.ellipse(jupiter.x, jupiter.y, moon.distance, moon.distance * 0.7, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            });
         }
         
-        if (checkWebGL()) {
-            init();
-        } else {
-            document.getElementById('loading').innerHTML = `
-                <div style="text-align: center; color: #ff4444; padding: 20px;">
-                    <h2>⚠️ WebGL не поддерживается</h2>
-                    <p>Обновите браузер или используйте Chrome/Firefox</p>
-                </div>
-            `;
+        // Отрисовка колец Юпитера
+        function drawRings() {
+            const gradient = ctx.createRadialGradient(
+                jupiter.x, jupiter.y, rings.innerRadius,
+                jupiter.x, jupiter.y, rings.outerRadius
+            );
+            gradient.addColorStop(0, 'rgba(150, 150, 200, 0.05)');
+            gradient.addColorStop(0.5, 'rgba(180, 180, 220, 0.15)');
+            gradient.addColorStop(1, 'rgba(150, 150, 200, 0.05)');
+            
+            ctx.save();
+            ctx.translate(jupiter.x, jupiter.y);
+            ctx.rotate(rings.rotation);
+            ctx.translate(-jupiter.x, -jupiter.y);
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.ellipse(jupiter.x, jupiter.y, rings.outerRadius, rings.outerRadius * 0.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
         }
+        
+        // Отрисовка Юпитера
+        function drawJupiter() {
+            // Свечение Юпитера
+            if (jupiter.glow > 0) {
+                const gradient = ctx.createRadialGradient(
+                    jupiter.x, jupiter.y, 0,
+                    jupiter.x, jupiter.y, jupiter.radius * 2
+                );
+                gradient.addColorStop(0, `rgba(100, 150, 255, ${0.3 * jupiter.glow})`);
+                gradient.addColorStop(1, 'rgba(100, 150, 255, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(jupiter.x, jupiter.y, jupiter.radius * 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Уменьшаем свечение со временем
+                jupiter.glow -= 0.02;
+                if (jupiter.glow < 0) jupiter.glow = 0;
+            }
+            
+            // Основной диск Юпитера
+            const gradient = ctx.createRadialGradient(
+                jupiter.x - jupiter.radius/3, jupiter.y - jupiter.radius/3, 0,
+                jupiter.x, jupiter.y, jupiter.radius
+            );
+            gradient.addColorStop(0, '#f9d17e');
+            gradient.addColorStop(0.3, '#d8a85a');
+            gradient.addColorStop(0.6, '#b88646');
+            gradient.addColorStop(1, '#8b5a2b');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(jupiter.x, jupiter.y, jupiter.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Полосы на Юпитере
+            ctx.save();
+            ctx.translate(jupiter.x, jupiter.y);
+            ctx.rotate(jupiter.rotation);
+            
+            // Темные полосы
+            ctx.fillStyle = '#8b5a2b';
+            for (let i = -4; i <= 4; i++) {
+                const bandHeight = jupiter.radius * 0.1;
+                const bandY = i * jupiter.radius * 0.25;
+                
+                ctx.beginPath();
+                ctx.ellipse(0, bandY, jupiter.radius * 0.9, bandHeight, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Большое Красное Пятно
+            ctx.fillStyle = '#cc5533';
+            ctx.beginPath();
+            ctx.ellipse(jupiter.radius * 0.5, -jupiter.radius * 0.2, jupiter.radius * 0.3, jupiter.radius * 0.15, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Детализация пятна
+            ctx.fillStyle = '#aa4422';
+            ctx.beginPath();
+            ctx.ellipse(jupiter.radius * 0.5, -jupiter.radius * 0.2, jupiter.radius * 0.25, jupiter.radius * 0.1, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Обводка для выделения
+            ctx.strokeStyle = 'rgba(200, 200, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(jupiter.x, jupiter.y, jupiter.radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        // Отрисовка спутников
+        function drawMoons() {
+            moons.forEach(moon => {
+                // Если взрыв активен и спутник рассеивается
+                if (explosionActive && moon.scattered) {
+                    moon.x += moon.scatterVX;
+                    moon.y += moon.scatterVY;
+                    moon.scatterVY += 0.05; // Гравитация
+                    moon.angle += moon.scatterRotation;
+                } else {
+                    // Нормальное орбитальное движение
+                    moon.angle += moon.speed;
+                    moon.x = jupiter.x + Math.cos(moon.angle) * moon.distance;
+                    moon.y = jupiter.y + Math.sin(moon.angle) * moon.distance * 0.7;
+                }
+                
+                // Тень спутника
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.arc(moon.x + moon.radius * 0.3, moon.y + moon.radius * 0.3, moon.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Основной диск спутника
+                const gradient = ctx.createRadialGradient(
+                    moon.x - moon.radius/2, moon.y - moon.radius/2, 0,
+                    moon.x, moon.y, moon.radius
+                );
+                gradient.addColorStop(0, moon.color);
+                gradient.addColorStop(1, darkenColor(moon.color, 40));
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(moon.x, moon.y, moon.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Детали на спутниках
+                ctx.fillStyle = darkenColor(moon.color, 20);
+                ctx.beginPath();
+                ctx.arc(moon.x - moon.radius * 0.3, moon.y - moon.radius * 0.2, moon.radius * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Обводка спутника
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(moon.x, moon.y, moon.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Название спутника (только если не рассеивается)
+                if (!explosionActive || !moon.scattered) {
+                    ctx.fillStyle = '#aaf';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(moon.name, moon.x, moon.y - moon.radius - 10);
+                }
+            });
+        }
+        
+        // Отрисовка частиц взрыва
+        function drawParticles() {
+            particles.forEach((particle, index) => {
+                // Обновляем позицию частицы
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.life -= particle.decay;
+                particle.rotation += particle.rotationSpeed;
+                
+                // Если частица "мертва", удаляем ее
+                if (particle.life <= 0) {
+                    particles.splice(index, 1);
+                    return;
+                }
+                
+                // Рисуем частицу
+                ctx.save();
+                ctx.translate(particle.x, particle.y);
+                ctx.rotate(particle.rotation);
+                
+                if (particle.type === "fire") {
+                    // Огненные частицы
+                    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, particle.radius);
+                    gradient.addColorStop(0, `rgba(255, 200, 0, ${particle.life})`);
+                    gradient.addColorStop(1, `rgba(255, 50, 0, 0)`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, particle.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (particle.type === "gas") {
+                    // Газовые частицы
+                    ctx.fillStyle = `rgba(100, 200, 255, ${particle.life * 0.7})`;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, particle.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Обломки
+                    ctx.fillStyle = `rgba(139, 90, 43, ${particle.life})`;
+                    ctx.beginPath();
+                    ctx.rect(-particle.radius, -particle.radius, particle.radius * 2, particle.radius * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            });
+        }
+        
+        // Функция для затемнения цвета
+        function darkenColor(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) - amt;
+            const G = (num >> 8 & 0x00FF) - amt;
+            const B = (num & 0x0000FF) - amt;
+            
+            return "#" + (
+                0x1000000 + 
+                (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + 
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + 
+                (B < 255 ? B < 1 ? 0 : B : 255)
+            ).toString(16).slice(1);
+        }
+        
+        // Основной цикл анимации
+        function animate() {
+            // Очищаем canvas через отрисовку звезд
+            drawStars();
+            
+            // Обновляем вращение
+            jupiter.rotation += jupiter.rotationSpeed;
+            rings.rotation += rings.rotationSpeed;
+            
+            // Если взрыв активен
+            if (explosionActive) {
+                explosionTime += 16; // Примерно 60 FPS
+                
+                // Если время взрыва истекло
+                if (explosionTime >= explosionDuration) {
+                    explosionActive = false;
+                    explosionText.style.opacity = 0;
+                    clickCount = 0;
+                    clickCountElement.textContent = clickCount;
+                }
+            }
+            
+            // Рисуем элементы системы
+            drawOrbits();
+            drawRings();
+            drawJupiter();
+            drawMoons();
+            
+            // Если активен взрыв, рисуем частицы
+            if (explosionActive) {
+                drawParticles();
+            }
+            
+            // Запрашиваем следующий кадр
+            requestAnimationFrame(animate);
+        }
+        
+        // Инициализация
+        function init() {
+            initStars();
+            handleResize();
+            
+            // Добавляем обработчики событий
+            window.addEventListener('resize', handleResize);
+            canvas.addEventListener('click', handleCanvasClick);
+            
+            // Запускаем анимацию
+            animate();
+        }
+        
+        // Запускаем приложение после загрузки страницы
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>

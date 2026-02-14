@@ -1,142 +1,220 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Для Алёнушки ❤️</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            background: linear-gradient(135deg, #ffb6c1, #ff8fab, #ffc0cb, #ff69b4);
-            overflow: hidden;
-            font-family: 'Segoe Script', 'Comic Sans MS', cursive;
-            color: white;
-            text-align: center;
-        }
+<meta charset="UTF-8">
+<title>Для Алёнушки ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Comfortaa:wght@400;700&display=swap');
 
-        h1 {
-            font-size: 4.8rem;
-            margin: 40px 0 10px;
-            text-shadow: 0 0 20px rgba(255, 20, 147, 0.9);
-            animation: glow 3s ease-in-out infinite alternate;
-        }
+    body {
+        margin: 0;
+        height: 100vh;
+        background: linear-gradient(135deg, #ff9ec8, #ffc2d6, #ffe0f0, #ff9ec8);
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Comfortaa', cursive;
+        color: #d6336c;
+    }
 
-        .scene {
-            position: relative;
-            height: 380px;
-            margin: 30px auto;
-            width: 900px;
-        }
+    .container {
+        text-align: center;
+        z-index: 5;
+    }
 
-        /* Падающие сердечки */
-        .heart {
-            position: absolute;
-            top: -50px;
-            font-size: 28px;
-            animation: fall linear forwards;
-            filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.9));
-            z-index: 1;
-        }
+    h1 {
+        font-family: 'Pacifico', cursive;
+        font-size: 4.8rem;
+        margin: 0 0 10px 0;
+        background: linear-gradient(45deg, #ff4d8d, #ff8fab);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(255,77,141,0.4);
+        animation: pulse 3s infinite;
+    }
 
-        @keyframes fall {
-            to {
-                transform: translateY(110vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
+    p {
+        font-size: 2.1rem;
+        margin: 15px 0;
+        font-weight: 700;
+        text-shadow: 0 0 15px rgba(255,255,255,0.7);
+    }
 
-        .final-text {
-            font-size: 2.6rem;
-            margin-top: 40px;
-            opacity: 0;
-            animation: fadeIn 4s forwards 13s;
-            text-shadow: 0 0 15px #ff1493;
-        }
+    .scene {
+        position: relative;
+        width: 720px;
+        height: 380px;
+        margin: 30px auto;
+        perspective: 1200px; /* Небольшое 3D-пространство */
+        transform-style: preserve-3d;
+    }
 
-        @keyframes glow { 0% { text-shadow: 0 0 20px #ff1493; } 100% { text-shadow: 0 0 40px #ff69b4, 0 0 60px #ff1493; } }
-        @keyframes fadeIn { to { opacity: 1; } }
-    </style>
+    svg { 
+        position: absolute; 
+        transition: transform 0.3s; /* Для плавности */
+        filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15));
+    }
+
+    /* Ёжик */
+    #hedgehog { 
+        left: -180px; 
+        bottom: 60px;
+        animation: hedgehogWalk 9s ease-in-out forwards;
+    }
+
+    /* Мышка */
+    #mouse {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 70px;
+        z-index: 2;
+    }
+
+    /* Яблоко */
+    #apple {
+        left: 50%;
+        top: 100px;
+        transform: translateX(-50%);
+        opacity: 0;
+        animation: appleShow 9s ease-in-out forwards;
+    }
+
+    /* Волк */
+    #wolf {
+        right: -220px;
+        bottom: 50px;
+        animation: wolfRun 9s ease-in-out forwards 4.2s;
+        z-index: 3;
+    }
+
+    /* Укус с 3D-эффектом */
+    .bite {
+        position: absolute;
+        left: 54%;
+        top: 165px;
+        font-size: 5.5rem;
+        opacity: 0;
+        animation: bite 2.8s ease-in-out forwards 11s;
+        pointer-events: none;
+        transform-style: preserve-3d;
+    }
+
+    .final-text {
+        font-size: 2.6rem;
+        margin-top: 20px;
+        opacity: 0;
+        animation: showText 2s forwards 13.5s;
+        line-height: 1.4;
+    }
+
+    @keyframes hedgehogWalk { 
+        0% {left:-180px; transform: rotateY(0deg);} 
+        45% {left: 220px; transform: rotateY(5deg);} 
+        100% {left: 220px; transform: rotateY(0deg);} 
+    }
+    @keyframes appleShow { 
+        40% {opacity:0;} 
+        52% {opacity:1;} 
+        100% {opacity:1;} 
+    }
+    @keyframes wolfRun { 
+        0% {right:-220px; transform: rotateY(0deg);} 
+        58% {right: 180px; transform: rotateY(-5deg);} 
+        100% {right: 180px; transform: rotateY(0deg);} 
+    }
+    @keyframes bite { 
+        0%,15% {opacity:0; transform: scale(0.5) rotateY(10deg);} 
+        40% {opacity:1; transform: scale(1.25) rotateY(-10deg);} 
+        70% {transform: scale(0.95) rotateY(5deg);} 
+        100% {opacity:1; transform: scale(1) rotateY(0deg);} 
+    }
+    @keyframes showText { to {opacity:1;} }
+    @keyframes pulse { 0%,100% {transform:scale(1);} 50% {transform:scale(1.06);} }
+</style>
 </head>
 <body>
-    <h1>Моя дорогая Алёнушка...</h1>
-    <p style="font-size: 2.1rem; margin-bottom: 20px;">С Днём всех влюблённых ❤️</p>
+
+<div class="container">
+    <h1>Алёнушка моя ❤️</h1>
+    <p>С Днём всех влюблённых, солнышко</p>
 
     <div class="scene">
-        <!-- Ёжик -->
-        <svg class="hedgehog" width="180" height="160" style="position:absolute; bottom:80px; left:80px;" viewBox="0 0 200 180">
-            <ellipse cx="100" cy="110" rx="65" ry="55" fill="#5a8c3a"/>
-            <circle cx="75" cy="80" r="28" fill="#4a7a2e"/>
-            <circle cx="125" cy="75" r="32" fill="#4a7a2e"/>
-            <!-- иголки -->
-            <path d="M60 70 Q50 40 70 50" stroke="#3e6b25" stroke-width="14" fill="none"/>
-            <path d="M85 60 Q75 30 95 45" stroke="#3e6b25" stroke-width="16" fill="none"/>
-            <circle cx="95" cy="95" r="22" fill="#ffe4e1"/>
-            <circle cx="88" cy="88" r="6" fill="#000"/>
-            <circle cx="102" cy="88" r="6" fill="#000"/>
-            <path d="M90 105 Q100 115 110 102" fill="none" stroke="#ff69b4" stroke-width="5"/>
-            <text x="105" y="148" font-size="60">🍎</text>
+        <!-- Ёжик SVG (детализированный) -->
+        <svg id="hedgehog" width="180" height="180" viewBox="0 0 180 180">
+            <path d="M90 150 Q0 90 90 30 Q180 90 90 150" fill="#8B4513" /> <!-- Тело -->
+            <circle cx="90" cy="90" r="40" fill="#D2B48C" /> <!-- Морда -->
+            <circle cx="105" cy="80" r="5" fill="#000" /> <!-- Глаз -->
+            <circle cx="90" cy="100" r="3" fill="#000" /> <!-- Нос -->
+            <!-- Яблоко на спине -->
+            <path d="M90 50 Q70 20 90 0 Q110 20 90 50" fill="#FF0000" />
+            <path d="M90 0 L95 -10 Q100 -15 105 -10" fill="#228B22" /> <!-- Лист -->
+        </svg>
+        
+        <!-- Мышка SVG -->
+        <svg id="mouse" width="130" height="160" viewBox="0 0 130 160">
+            <ellipse cx="65" cy="120" rx="50" ry="40" fill="#A9A9A9" /> <!-- Тело -->
+            <circle cx="65" cy="80" r="30" fill="#D3D3D3" /> <!-- Голова -->
+            <circle cx="75" cy="75" r="5" fill="#000" /> <!-- Глаз -->
+            <path d="M65 90 Q55 100 65 110" fill="none" stroke="#000" stroke-width="2" /> <!-- Усмешка -->
+            <path d="M30 80 Q0 100 30 120" fill="#FFC0CB" /> <!-- Ухо -->
+        </svg>
+        
+        <!-- Яблоко SVG -->
+        <svg id="apple" width="90" height="100" viewBox="0 0 90 100">
+            <path d="M45 80 Q20 50 45 20 Q70 50 45 80" fill="#FF0000" stroke="#8B0000" stroke-width="2" />
+            <path d="M45 20 L50 10 Q55 5 60 10" fill="#228B22" />
+        </svg>
+        
+        <!-- Волк SVG -->
+        <svg id="wolf" width="220" height="190" viewBox="0 0 220 190">
+            <path d="M110 150 Q40 100 110 50 Q180 100 110 150" fill="#808080" /> <!-- Тело -->
+            <circle cx="110" cy="80" r="40" fill="#A9A9A9" /> <!-- Голова -->
+            <circle cx="125" cy="70" r="8" fill="#00FF00" /> <!-- Глаз -->
+            <path d="M110 90 L130 100 L110 110" fill="#FF0000" /> <!-- Язык (намёк на укус) -->
         </svg>
 
-        <!-- Мышка Алёнушка -->
-        <svg class="mouse" width="140" height="160" style="position:absolute; bottom:70px; left:380px;" viewBox="0 0 140 160">
-            <ellipse cx="70" cy="105" rx="48" ry="52" fill="#f8d7da"/>
-            <circle cx="70" cy="65" r="38" fill="#f8d7da"/>
-            <!-- ушки -->
-            <ellipse cx="48" cy="38" rx="18" ry="25" fill="#f8d7da" transform="rotate(-25 48 38)"/>
-            <ellipse cx="92" cy="38" rx="18" ry="25" fill="#f8d7da" transform="rotate(25 92 38)"/>
-            <circle cx="58" cy="58" r="9" fill="#000"/>
-            <circle cx="82" cy="58" r="9" fill="#000"/>
-            <circle cx="60" cy="56" r="4" fill="#fff"/>
-            <circle cx="84" cy="56" r="4" fill="#fff"/>
-            <path d="M60 78 Q70 88 80 76" fill="none" stroke="#ff1493" stroke-width="6" stroke-linecap="round"/>
-            <text x="105" y="125" font-size="32">🎀</text>
-        </svg>
-
-        <!-- Волк -->
-        <svg class="wolf" width="190" height="170" style="position:absolute; bottom:65px; right:90px;" viewBox="0 0 200 180">
-            <ellipse cx="100" cy="100" rx="72" ry="58" fill="#555"/>
-            <circle cx="75" cy="65" r="32" fill="#444"/>
-            <circle cx="125" cy="62" r="35" fill="#444"/>
-            <!-- морда -->
-            <ellipse cx="100" cy="88" rx="38" ry="32" fill="#777"/>
-            <circle cx="82" cy="78" r="11" fill="#000"/>
-            <circle cx="118" cy="76" r="11" fill="#000"/>
-            <path d="M85 95 Q100 110 115 92" fill="none" stroke="#ff1493" stroke-width="7"/>
-            <text x="125" y="105" font-size="48">😈</text>
-        </svg>
-
-        <!-- Укус -->
-        <div class="bite" style="position:absolute; bottom:95px; left:515px; font-size:85px; opacity:0;">🍑💥</div>
+        <div class="bite">🍑<span style="font-size:3.2rem; margin-left:-15px;">💋😏</span></div>
     </div>
 
     <p class="final-text">
-        Ёжик принёс тебе самое сладкое яблочко...<br>
-        а потом прибежал голодный волк и страстно укусил Алёнушку за попку ❤️‍🔥
+        Ёжик целый день шёл к тебе с самым спелым яблочком...<br>
+        А потом прибежал волк и <b>нежно укусил тебя за попку</b>, потому что любит по-настоящему ❤️🔥
     </p>
+</div>
 
-    <script>
-        const colors = ['#ff1493', '#ff69b4', '#ffb6c1', '#ff8fab', '#ffc0cb', '#db7093'];
+<!-- Оптимизированный дождь сердечек + искры -->
+<script>
+function createHeart(type = 'heart') {
+    const elem = document.createElement('div');
+    elem.innerHTML = type === 'heart' ? ['❤️','💕','💖','🩷','💗'][Math.floor(Math.random()*5)] : '✨';
+    elem.style.cssText = `
+        position:fixed; left:${Math.random()*100}vw; top:-10px; font-size:${type === 'heart' ? 12+Math.random()*25 : 8+Math.random()*12}px;
+        pointer-events:none; z-index:1; opacity:0.7; animation:fall ${type === 'heart' ? 6+Math.random()*8 : 3+Math.random()*4}s linear forwards;
+        filter: drop-shadow(0 0 8px #ff4d8d);
+    `;
+    document.body.appendChild(elem);
+    
+    setTimeout(() => elem.remove(), 15000);
+}
 
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.innerHTML = Math.random() > 0.5 ? '❤️' : '💗';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.fontSize = (22 + Math.random() * 28) + 'px';
-            heart.style.opacity = 0.6 + Math.random() * 0.4;
-            heart.style.color = colors[Math.floor(Math.random() * colors.length)];
-            heart.style.animationDuration = (6 + Math.random() * 7) + 's';
-            document.body.appendChild(heart);
+const style = document.createElement('style');
+style.textContent = `@keyframes fall { to { transform: translateY(110vh) rotate(480deg); opacity:0 } }`;
+document.head.appendChild(style);
 
-            setTimeout(() => heart.remove(), 14000);
-        }
+// Частота: больше, но лимит 60 элементов
+setInterval(() => {
+    if (document.querySelectorAll('div').length < 60) {
+        createHeart('heart');
+        if (Math.random() > 0.5) createHeart('sparkle');
+    }
+}, 200);
 
-        // Оптимизированный запуск сердечек
-        setInterval(createHeart, 280);
-        for (let i = 0; i < 18; i++) {
-            setTimeout(createHeart, i * 180);
-        }
-    </script>
+for(let i = 0; i < 30; i++) {
+    createHeart('heart');
+    createHeart('sparkle');
+}
+</script>
 </body>
 </html>
